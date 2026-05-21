@@ -51,7 +51,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function Demo(): JSX.Element {
   const { t } = useTranslation();
-  const { createConversation, saveMessage, conversations } = useHistoryStore();
+  const { createConversation, saveMessage, conversations, deleteConversation, renameConversation } = useHistoryStore();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [lastSubmitted, setLastSubmitted] = useState("");
@@ -94,6 +94,11 @@ export default function Demo(): JSX.Element {
           onNewConversation={() => {
             const id = createConversation();
             setActiveId(id);
+          }}
+          onRenameConversation={renameConversation}
+          onDeleteConversation={(id) => {
+            deleteConversation(id);
+            if (id === activeId) setActiveId(null);
           }}
         />
 
@@ -163,6 +168,11 @@ export default function Demo(): JSX.Element {
         onNewConversation={() => {
           const id = createConversation();
           setActiveId(id);
+        }}
+        onRenameConversation={renameConversation}
+        onDeleteConversation={(id) => {
+          deleteConversation(id);
+          if (id === activeId) setActiveId(null);
         }}
       />
     </div>

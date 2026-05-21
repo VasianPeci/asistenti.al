@@ -73,6 +73,16 @@ body {
   0%   { background-position: -200px 0; }
   100% { background-position: calc(200px + 100%) 0; }
 }
+@keyframes confetti {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(92px) rotate(260deg);
+  }
+}
 .skeleton-shimmer {
   background: linear-gradient(90deg, #ececea 0%, #f6f5f1 50%, #ececea 100%);
   background-size: 200px 100%;

@@ -16,6 +16,14 @@ export interface AgentResponse {
   documents: string[];
   source: string | null;
   note?: string | null;
+  services?: SuggestedService[];
+  language?: "sq" | "en";
+  parseFailed?: boolean;
+}
+
+export interface SuggestedService {
+  label: string;
+  query: string;
 }
 
 export type SseEventType = "token" | "done" | "error";

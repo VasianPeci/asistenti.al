@@ -6,6 +6,8 @@ interface HistorySidebarProps {
   activeId: string | null;
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
+  onRenameConversation: (id: string, title: string) => void;
+  onDeleteConversation: (id: string) => void;
 }
 
 function RefreshIcon(): JSX.Element {
@@ -32,6 +34,8 @@ export default function HistorySidebar({
   activeId,
   onSelectConversation,
   onNewConversation,
+  onRenameConversation,
+  onDeleteConversation,
 }: HistorySidebarProps): JSX.Element {
   const { t } = useTranslation();
   const conversations = useHistoryStore((s) => s.conversations);
@@ -39,7 +43,7 @@ export default function HistorySidebar({
   return (
     <aside
       className="hidden md:flex w-[260px] shrink-0 flex-col border-r border-border"
-      style={{ background: "#EFEDE8", height: "calc(100dvh - 60px)" }}
+      style={{ background: "#EFEDE8", height: "100dvh" }}
     >
       <div className="px-4 pt-5 pb-3 border-b border-border">
         <div className="text-[11px] font-medium text-gray-muted tracking-[0.08em] uppercase">
@@ -52,6 +56,8 @@ export default function HistorySidebar({
           conversations={conversations}
           activeId={activeId}
           onSelect={onSelectConversation}
+          onRename={onRenameConversation}
+          onDelete={onDeleteConversation}
         />
       </div>
 

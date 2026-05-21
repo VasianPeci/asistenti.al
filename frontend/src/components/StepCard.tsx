@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { AgentResponse } from "../api/types";
 
 interface StepCardProps {
   response: AgentResponse;
+  onServiceSelect?: (query: string) => void;
 }
 
 function CheckIcon(): JSX.Element {
@@ -27,35 +28,56 @@ function CheckIcon(): JSX.Element {
   );
 }
 
-export default function StepCard({ response }: StepCardProps): JSX.Element {
-  const { t } = useTranslation();
+export default function StepCard({ response, onServiceSelect }: StepCardProps): JSX.Element {
+  const { i18n, t } = useTranslation();
   const [checked, setChecked] = useState<Record<number, boolean>>({});
   const [copied, setCopied] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
 
   const total = response.steps.length;
+  const services = response.services ?? [];
+  const responseLocale =
+    response.language === "sq" ? "al" : response.language === "en" ? "en" : i18n.language;
+  const tr = (key: string, values?: Record<string, unknown>): string =>
+    t(key, { ...values, lng: responseLocale });
   const done = useMemo(
     () => Object.values(checked).filter(Boolean).length,
     [checked]
   );
   const pct = total === 0 ? 0 : done / total;
 
+  useEffect(() => {
+    if (total === 0 || done !== total) {
+      setCelebrate(false);
+      return;
+    }
+    setCelebrate(true);
+    const timer = window.setTimeout(() => setCelebrate(false), 2600);
+    return () => window.clearTimeout(timer);
+  }, [done, total]);
+
   const toggle = (i: number): void =>
     setChecked((prev) => ({ ...prev, [i]: !prev[i] }));
 
   const buildCopyText = (): string => {
     const lines: string[] = [response.answer, ""];
+    if (services.length > 0) {
+      lines.push(tr("chat.services") + ":");
+      services.forEach((service) => lines.push(`- ${service.label}`));
+      lines.push("");
+    }
     if (response.steps.length > 0) {
-      lines.push(t("chat.steps") + ":");
+      lines.push(tr("chat.steps") + ":");
       response.steps.forEach((s, i) => lines.push(`${i + 1}. ${s}`));
       lines.push("");
     }
     if (response.documents.length > 0) {
-      lines.push(t("chat.documentsRequired") + ":");
+      lines.push(tr("chat.documentsRequired") + ":");
       response.documents.forEach((d) => lines.push(`- ${d}`));
       lines.push("");
     }
     if (response.note) lines.push(response.note);
-    if (response.source) lines.push(`\n${t("chat.source")}: ${response.source}`);
+    if (response.source) lines.push(`\n${tr("chat.source")}: ${response.source}`);
     return lines.join("\n");
   };
 
@@ -100,7 +122,7 @@ export default function StepCard({ response }: StepCardProps): JSX.Element {
           <>
             <div className="mb-3.5">
               <div className="text-[11px] text-gray-muted mb-1.5">
-                {t("chat.progress", { done, total })}
+                {tr("chat.progress", { done, total })}
               </div>
               <div className="h-[3px] bg-soft rounded-sm overflow-hidden">
                 <div
@@ -111,7 +133,7 @@ export default function StepCard({ response }: StepCardProps): JSX.Element {
             </div>
 
             <div className="text-[11px] font-medium text-gray-muted tracking-wider uppercase mb-3">
-              {t("chat.steps")}
+              {tr("chat.steps")}
             </div>
 
             <ul className="m-0 p-0 list-none">
@@ -161,6 +183,49 @@ export default function StepCard({ response }: StepCardProps): JSX.Element {
                 );
               })}
             </ul>
+
+            {done === total && (
+              <div className="mt-4 rounded-lg border border-[#DAD7C5] bg-[#FCFAEF] px-3.5 py-2.5 text-[13px] text-fg leading-[1.5] relative overflow-hidden">
+                {celebrate && (
+                  <div className="pointer-events-none absolute inset-0">
+                    {Array.from({ length: 14 }).map((_, i) => (
+                      <span
+                        key={i}
+                        className="absolute w-1.5 h-2.5 rounded-sm animate-[confetti_1.6s_ease-out_forwards]"
+                        style={{
+                          left: `${8 + i * 6}%`,
+                          top: "-10%",
+                          backgroundColor: ["#1F7A5A", "#D9A441", "#C65B4A", "#4B75B8"][i % 4],
+                          animationDelay: `${(i % 5) * 0.08}s`,
+                          transform: `rotate(${i * 17}deg)`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+                {tr("chat.completed")}
+              </div>
+            )}
+          </>
+        )}
+
+        {services.length > 0 && (
+          <>
+            <div className="text-[11px] font-medium text-gray-muted tracking-wider uppercase mb-3">
+              {tr("chat.services")}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {services.map((service) => (
+                <button
+                  key={service.query}
+                  type="button"
+                  onClick={() => onServiceSelect?.(service.query)}
+                  className="text-[13px] text-fg bg-soft hover:bg-[#E7E7DF] rounded-md px-3 py-1.5 transition-colors"
+                >
+                  {service.label}
+                </button>
+              ))}
+            </div>
           </>
         )}
 
@@ -168,7 +233,7 @@ export default function StepCard({ response }: StepCardProps): JSX.Element {
           <>
             <div className="border-t border-soft my-5" />
             <div className="text-[13px] font-semibold text-fg mb-2.5">
-              📋 {t("chat.documentsRequired")}
+              {tr("chat.documentsRequired")}
             </div>
             <ul className="flex flex-wrap gap-2 list-none m-0 p-0">
               {response.documents.map((doc, i) => (
@@ -191,7 +256,7 @@ export default function StepCard({ response }: StepCardProps): JSX.Element {
 
         {response.source && (
           <div className="mt-3.5 text-[11px] text-gray-muted">
-            {t("chat.source")}: {response.source}
+            {tr("chat.source")}: {response.source}
           </div>
         )}
       </div>

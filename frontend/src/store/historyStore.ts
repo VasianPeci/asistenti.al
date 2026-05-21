@@ -7,9 +7,11 @@ export interface Conversation {
   messages: Message[];
   createdAt: number;
   updatedAt: number;
+  locale?: "al" | "en";
 }
 
 const STORAGE_KEY = "asistenti_history";
+const LOCALE_STORAGE_KEY = "asistenti_locale";
 const MAX_CONVERSATIONS = 20;
 const TITLE_MAX = 60;
 
@@ -19,7 +21,12 @@ function safeRead(): Conversation[] {
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isConversation);
+    const conversations = parsed.filter(isConversation);
+    const migrated = conversations.map((c) =>
+      c.locale ? c : { ...c, locale: currentLocale() }
+    );
+    if (migrated.some((c, i) => c !== conversations[i])) safeWrite(migrated);
+    return migrated;
   } catch {
     return [];
   }
@@ -51,6 +58,15 @@ function truncateTitle(text: string): string {
   return `${trimmed.slice(0, TITLE_MAX - 1).trimEnd()}…`;
 }
 
+function currentLocale(): "al" | "en" {
+  try {
+    const raw = localStorage.getItem(LOCALE_STORAGE_KEY);
+    return raw === "en" ? "en" : "al";
+  } catch {
+    return "al";
+  }
+}
+
 function newId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
@@ -69,6 +85,7 @@ interface HistoryState {
   saveMessage: (id: string, message: Message) => void;
   loadConversation: (id: string) => Conversation | null;
   listConversations: () => Conversation[];
+  renameConversation: (id: string, title: string) => void;
   deleteConversation: (id: string) => void;
   clearAll: () => void;
 }
@@ -84,6 +101,7 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
       messages: [],
       createdAt: now,
       updatedAt: now,
+      locale: currentLocale(),
     };
     const next = pruneAndSort([convo, ...get().conversations]);
     safeWrite(next);
@@ -115,6 +133,17 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
 
   listConversations: () =>
     [...get().conversations].sort((a, b) => b.updatedAt - a.updatedAt),
+
+  renameConversation: (id, title) => {
+    const trimmed = truncateTitle(title);
+    if (!trimmed) return;
+    const next = get().conversations.map((c) =>
+      c.id === id ? { ...c, title: trimmed, updatedAt: Date.now() } : c
+    );
+    const sorted = pruneAndSort(next);
+    safeWrite(sorted);
+    set({ conversations: sorted });
+  },
 
   deleteConversation: (id) => {
     const next = get().conversations.filter((c) => c.id !== id);

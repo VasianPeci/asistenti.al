@@ -38,7 +38,12 @@ export default function Chat(): JSX.Element {
     failStream,
   } = useChatStore();
 
-  const { conversations, createConversation } = useHistoryStore();
+  const {
+    conversations,
+    createConversation,
+    deleteConversation,
+    renameConversation,
+  } = useHistoryStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [lastUserMessage, setLastUserMessage] = useState<string>("");
@@ -103,6 +108,38 @@ export default function Chat(): JSX.Element {
       }
     },
     [sessionId, setActiveConversation]
+  );
+
+  const handleRenameConversation = useCallback(
+    (id: string, title: string): void => {
+      renameConversation(id, title);
+    },
+    [renameConversation]
+  );
+
+  const handleDeleteConversation = useCallback(
+    (id: string): void => {
+      abortRef.current?.abort();
+      void deleteSession(id);
+
+      const remaining = useHistoryStore
+        .getState()
+        .listConversations()
+        .filter((c) => c.id !== id);
+      deleteConversation(id);
+
+      if (id !== sessionId) return;
+      const next = remaining[0];
+      if (next) {
+        setActiveConversation(next.id);
+        if (next.messages.length > 0) {
+          void restoreSession(next.id, next.messages);
+        }
+      } else {
+        startNewConversation();
+      }
+    },
+    [deleteConversation, sessionId, setActiveConversation, startNewConversation]
   );
 
   const handleSubmit = useCallback(
@@ -195,6 +232,8 @@ export default function Chat(): JSX.Element {
         activeId={sessionId}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
+        onRenameConversation={handleRenameConversation}
+        onDeleteConversation={handleDeleteConversation}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -213,7 +252,11 @@ export default function Chat(): JSX.Element {
             >
               <div className="max-w-[720px] mx-auto flex flex-col gap-6">
                 {messages.map((m) => (
-                  <MessageView key={m.id} message={m} />
+                  <MessageView
+                    key={m.id}
+                    message={m}
+                    onServiceSelect={handleSubmit}
+                  />
                 ))}
                 {isStreaming && displayStreamingText && (
                   <MessageBubble variant="assistant">
@@ -261,17 +304,25 @@ export default function Chat(): JSX.Element {
         onClose={() => setDrawerOpen(false)}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
+        onRenameConversation={handleRenameConversation}
+        onDeleteConversation={handleDeleteConversation}
       />
     </div>
   );
 }
 
-function MessageView({ message }: { message: Message }): JSX.Element {
+function MessageView({
+  message,
+  onServiceSelect,
+}: {
+  message: Message;
+  onServiceSelect: (query: string) => void;
+}): JSX.Element {
   if (message.role === "user") {
     return <MessageBubble variant="user">{message.content}</MessageBubble>;
   }
   if (message.response) {
-    return <StepCard response={message.response} />;
+    return <StepCard response={message.response} onServiceSelect={onServiceSelect} />;
   }
   return <MessageBubble variant="assistant">{message.content}</MessageBubble>;
 }

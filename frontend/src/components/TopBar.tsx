@@ -6,17 +6,6 @@ interface TopBarProps {
   onClearConversation?: () => void;
 }
 
-function Sparkle(): JSX.Element {
-  return (
-    <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" className="shrink-0">
-      <path
-        d="M5 0.5L5.9 4.1L9.5 5L5.9 5.9L5 9.5L4.1 5.9L0.5 5L4.1 4.1Z"
-        fill="#B8B6AF"
-      />
-    </svg>
-  );
-}
-
 function ClockIcon(): JSX.Element {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -66,13 +55,7 @@ export default function TopBar({
         </span>
       </div>
 
-      <div className="flex items-center gap-4 md:gap-[18px]">
-        <span className="hidden md:inline-flex items-center gap-1.5 text-[11.5px] text-[#B8B6AF]">
-          <Sparkle />
-          {t("app.builtWith")}&nbsp;
-          <span className="text-gray font-medium">{t("app.aiLabel")}</span>
-        </span>
-
+      <div className="flex items-center gap-3 md:gap-4">
         {onOpenHistory && (
           <button
             type="button"

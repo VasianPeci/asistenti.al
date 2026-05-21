@@ -53,6 +53,7 @@ export interface StreamChatOptions {
   message: string;
   history?: ChatMessage[];
   contextChunks?: RetrievedChunk[];
+  responseLanguage?: "sq" | "en";
 }
 
 export async function* streamChat(
@@ -60,7 +61,10 @@ export async function* streamChat(
 ): AsyncGenerator<string, void, void> {
   const { message, history = [], contextChunks = [] } = options;
 
-  const systemInstruction = buildSystemPrompt(formatContext(contextChunks));
+  const systemInstruction = buildSystemPrompt(
+    formatContext(contextChunks),
+    options.responseLanguage
+  );
   logger.info("gemini.prompt.built", {
     contextChunks: contextChunks.length,
     historyMessages: history.length,

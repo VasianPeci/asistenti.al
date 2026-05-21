@@ -3,9 +3,10 @@ import { z } from "zod";
 import type { ApiErrorBody } from "../types";
 import { logger } from "../utils/logger";
 import { retrieve, type RetrievedChunk } from "../rag/retriever";
+import { mergeRetrievedChunks, retrievePinnedServiceChunks } from "../rag/localGrounding";
 import { friendlySource } from "../rag/sourceMap";
 import { streamChat } from "../agent/gemini";
-import { parseAgentResponse, type AgentResponse } from "../agent/parser";
+import { parseAgentResponse, type AgentResponse, type SuggestedService } from "../agent/parser";
 import { appendMessages, clearSession, getHistory, setHistory } from "../agent/memory";
 
 export const chatRouter: Router = Router();
@@ -27,17 +28,190 @@ class AiGenerationTimeoutError extends Error {
   }
 }
 
+function normalizeMessageText(text: string): string {
+  return text
+    .trim()
+    .toLocaleLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/(.)\1{2,}/g, "$1$1")
+    .replace(/[!?.,"'()[\]{}:;]+/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function detectResponseLanguage(text: string): "sq" | "en" {
+  const normalized = normalizeMessageText(text);
+  if (
+    /\b(si|cfare|cafe|ku|kur|sa|dua|duhet|mund|aplikoj|rinovoj|marr|kerkoj|dokument\w*|nevojiten|certifikat\w*|lindj\w*|vdekj\w*|vdekje|deshmi|penalitet|pasaport\w*|martes\w*|qendrim\w*|automjet\w*|pershendetj\w*|tung|ckemi|miredita|miremengjes|mirembrema)\b/u.test(
+      normalized
+    )
+  ) {
+    return "sq";
+  }
+  if (/[ëçËÇ]/.test(text)) return "sq";
+  return "en";
+}
+
 function isAlbanian(text: string): boolean {
   if (/[ëçËÇ]/.test(text)) return true;
   // Note: dropped "me" and "do" from the spec's keyword list — both are
   // common English words ("do you", "I do", "tell me") and produced
   // false positives that flipped English replies to Albanian.
   const al = /(?:^|[\s\p{P}])(si|te|per|nuk|eshte|kam|ne|dhe|nje|une|ti|ju|ka|ku|kur|sa|cfare)(?=$|[\s\p{P}])/iu;
-  return al.test(text);
+  return al.test(normalizeMessageText(text));
+}
+
+function isGreeting(text: string): boolean {
+  const normalized = normalizeMessageText(text);
+
+  if (!normalized) return false;
+  if (/^(hello+|hey+|hi+|pershendetje+|tung+|ckemi+)$/.test(normalized)) return true;
+
+  const greetings = new Set([
+    "hi",
+    "hello",
+    "hey",
+    "good morning",
+    "good afternoon",
+    "good evening",
+    "pershendetje",
+    "tung",
+    "ckemi",
+    "miremengjes",
+    "miredita",
+    "mirembrema",
+  ]);
+
+  return greetings.has(normalized);
+}
+
+function isAlbanianGreeting(text: string): boolean {
+  const normalized = normalizeMessageText(text);
+  if (/^(pershendetje+|tung+|ckemi+)$/.test(normalized)) return true;
+
+  return new Set([
+    "pershendetje",
+    "tung",
+    "ckemi",
+    "miremengjes",
+    "miredita",
+    "mirembrema",
+  ]).has(normalized);
+}
+
+function hasServiceIntent(text: string): boolean {
+  const normalized = normalizeMessageText(text);
+  if (!normalized) return false;
+
+  const serviceKeywords = [
+    "passport",
+    "pasaport",
+    "identity",
+    "id card",
+    "karte identitet",
+    "karta identitet",
+    "birth certificate",
+    "certifikat lindj",
+    "certifikate lindj",
+    "certifikaten e lindjes",
+    "akti i lindjes",
+    "death certificate",
+    "certifikat vdekj",
+    "certifikate vdekj",
+    "certifikaten e vdekjes",
+    "akti i vdekjes",
+    "vdekje",
+    "criminal record",
+    "deshmi penalitet",
+    "penalitet",
+    "business",
+    "biznes",
+    "nipt",
+    "tax",
+    "tatim",
+    "driver",
+    "license",
+    "licence",
+    "patent",
+    "leje drejtimi",
+    "lejen e drejtimit",
+    "vehicle",
+    "car registration",
+    "automjet",
+    "residence",
+    "leje qendrimi",
+    "qendrim",
+    "marriage",
+    "martes",
+    "martese",
+    "regjistrim martese",
+    "dokumente per martese",
+    "dokumentesh nevojiten per martese",
+    "diploma",
+    "diplome",
+    "matura",
+    "pension",
+    "punesim",
+    "employment",
+  ];
+
+  return serviceKeywords.some((keyword) => normalized.includes(keyword));
+}
+
+function serviceMenuResponse(message: string, reason: "greeting" | "unknown"): AgentResponse {
+  const sq = detectResponseLanguage(message) === "sq" || isAlbanianGreeting(message);
+  const services: SuggestedService[] = sq
+    ? [
+        { label: "Rinovimi i pasaportës", query: "Si të rinovoj pasaportën?" },
+        { label: "Aplikimi për kartë identiteti", query: "Si të aplikoj për kartë identiteti?" },
+        { label: "Certifikatë lindjeje", query: "Si të marr certifikatën e lindjes?" },
+        { label: "Certifikatë vdekjeje", query: "Si të marr certifikatën e vdekjes?" },
+        { label: "Dëshmi penaliteti", query: "Si të marr dëshmi penaliteti?" },
+        { label: "Regjistrimi i biznesit dhe NIPT", query: "Si të regjistroj biznesin dhe të marr NIPT?" },
+        { label: "Vërtetim për lejen e drejtimit", query: "Si të marr vërtetim për lejen e drejtimit?" },
+        { label: "Regjistrim automjeti", query: "Si të regjistroj automjetin?" },
+        { label: "Leje qëndrimi", query: "Si të marr leje qëndrimi?" },
+      ]
+    : [
+        { label: "Passport renewal", query: "How do I renew my passport?" },
+        { label: "Identity card application", query: "How do I apply for an identity card?" },
+        { label: "Birth certificate", query: "How do I get a birth certificate?" },
+        { label: "Death certificate", query: "How do I get a death certificate?" },
+        { label: "Criminal record certificate", query: "How do I get a criminal record certificate?" },
+        { label: "Business registration and NIPT", query: "How do I register a business and get NIPT?" },
+        { label: "Driver's license certificate", query: "How do I get a driver's license certificate?" },
+        { label: "Vehicle registration", query: "How do I register a vehicle?" },
+        { label: "Residence permit", query: "How do I get a residence permit?" },
+      ];
+  return sq
+    ? {
+        answer:
+          reason === "greeting"
+            ? "Përshëndetje! Mund t'ju ndihmoj me udhëzime për shërbime publike në Shqipëri. Zgjidhni një nga temat më poshtë ose shkruani pyetjen tuaj."
+            : "Përshëndetje! Mund t'ju ndihmoj vetëm me shërbime publike në Shqipëri. Nuk e identifikova shërbimin nga mesazhi juaj; zgjidhni një nga temat më poshtë ose shkruani një pyetje më specifike.",
+        steps: [],
+        documents: [],
+        source: null,
+        note: null,
+        services,
+        language: "sq",
+      }
+    : {
+        answer:
+          reason === "greeting"
+            ? "Hello! I can help with guidance for Albanian public services. Choose one of the topics below or ask your question."
+            : "Hello! I can only help with Albanian public services. I could not identify a service from your message; choose one of the topics below or ask a more specific question.",
+        steps: [],
+        documents: [],
+        source: null,
+        note: null,
+        services,
+        language: "en",
+      };
 }
 
 function noInfoResponse(message: string): AgentResponse {
-  const sq = isAlbanian(message);
+  const sq = detectResponseLanguage(message) === "sq";
   return sq
     ? {
         answer:
@@ -46,6 +220,8 @@ function noInfoResponse(message: string): AgentResponse {
         documents: [],
         source: null,
         note: "Provoni ta riformuloni pyetjen ose kontaktoni institucionin përkatës.",
+        services: [],
+        language: "sq",
       }
     : {
         answer:
@@ -54,7 +230,44 @@ function noInfoResponse(message: string): AgentResponse {
         documents: [],
         source: null,
         note: "Try rephrasing your question or contact the relevant institution.",
+        services: [],
+        language: "en",
       };
+}
+
+function isNoInfoAnswer(response: AgentResponse): boolean {
+  if (response.source?.trim().toLowerCase() === "no info") return true;
+  if (response.steps.length > 0) return false;
+
+  const text = normalizeMessageText([response.answer, response.note ?? "", response.source ?? ""].join(" "));
+  return (
+    text.includes("no info") ||
+    text.includes("do not have information") ||
+    text.includes("dont have information") ||
+    text.includes("cannot find any information") ||
+    text.includes("could not find enough information") ||
+    text.includes("nuk gjendet") ||
+    text.includes("nuk e gjeta") ||
+    text.includes("nuk gjeta informacion") ||
+    text.includes("nuk kam informacion")
+  );
+}
+
+function cleanFinalResponse(response: AgentResponse): AgentResponse {
+  if (response.parseFailed) {
+    response.documents = [];
+    response.source = null;
+    return response;
+  }
+  if (isNoInfoAnswer(response)) {
+    response.documents = [];
+    response.source = null;
+    return response;
+  }
+
+  response.documents = response.documents.filter((document) => !/\.txt$/i.test(document.trim()));
+  if (response.source?.trim().toLowerCase() === "no info") response.source = null;
+  return response;
 }
 
 function writeEvent(res: Response, type: SseEventType, data: unknown): void {
@@ -73,6 +286,65 @@ async function nextWithTimeout<T>(
     return await Promise.race([next, timeout]);
   } finally {
     if (timer) clearTimeout(timer);
+  }
+}
+
+async function collectAiResponseWithTimeout(options: {
+  message: string;
+  history: ReturnType<typeof getHistory>;
+  contextChunks: RetrievedChunk[];
+  responseLanguage: "sq" | "en";
+  sessionId: string;
+  clientClosed: () => boolean;
+}): Promise<string | null> {
+  let accumulated = "";
+  logger.info("chat.ai.stream.started", {
+    sessionId: options.sessionId,
+    timeoutMs: AI_STREAM_TIMEOUT_MS,
+  });
+  const stream = streamChat({
+    message: options.message,
+    history: options.history,
+    contextChunks: options.contextChunks,
+    responseLanguage: options.responseLanguage,
+  });
+  const iterator = stream[Symbol.asyncIterator]();
+  const deadline = Date.now() + AI_STREAM_TIMEOUT_MS;
+  let sawFirstToken = false;
+
+  try {
+    while (true) {
+      if (options.clientClosed()) {
+        await iterator.return?.();
+        return null;
+      }
+      const remainingMs = deadline - Date.now();
+      if (remainingMs <= 0) throw new AiGenerationTimeoutError();
+      const next = await nextWithTimeout(iterator.next(), remainingMs);
+      if (next.done) break;
+      const token = next.value;
+      if (!sawFirstToken) {
+        sawFirstToken = true;
+        logger.info("chat.ai.first_token.received", {
+          sessionId: options.sessionId,
+          chars: token.length,
+        });
+      }
+      accumulated += token;
+    }
+    logger.info("chat.ai.stream.finished", {
+      sessionId: options.sessionId,
+      responseChars: accumulated.length,
+    });
+    return accumulated;
+  } catch (err) {
+    await iterator.return?.().catch((returnErr: unknown) => {
+      logger.warn("chat.ai.stream.return_failed", {
+        sessionId: options.sessionId,
+        error: returnErr instanceof Error ? returnErr.message : String(returnErr),
+      });
+    });
+    throw err;
   }
 }
 
@@ -103,6 +375,7 @@ chatRouter.post("/chat", async (req, res) => {
   }
 
   const { message, sessionId } = parsed.data;
+  const responseLanguage = detectResponseLanguage(message);
   logger.info("chat.request.valid", { sessionId, messageChars: message.length });
 
   openSse(res);
@@ -137,10 +410,46 @@ chatRouter.post("/chat", async (req, res) => {
   try {
     const history = getHistory(sessionId);
 
-    let chunks: RetrievedChunk[] = [];
+    if (isGreeting(message)) {
+      logger.info("chat.greeting.detected", { sessionId });
+      const response = serviceMenuResponse(message, "greeting");
+      writeEvent(res, "token", response.answer);
+      writeEvent(res, "done", response);
+      logger.info("chat.response.done_sent", { sessionId, fallback: true, greeting: true });
+      appendMessages(sessionId, [
+        { role: "user", content: message },
+        { role: "assistant", content: response.answer },
+      ]);
+      res.end();
+      logger.info("chat.response.ended", { sessionId });
+      return;
+    }
+
+    if (!hasServiceIntent(message)) {
+      logger.info("chat.service_intent.not_identified", { sessionId });
+      const response = serviceMenuResponse(message, "unknown");
+      writeEvent(res, "token", response.answer);
+      writeEvent(res, "done", response);
+      logger.info("chat.response.done_sent", {
+        sessionId,
+        fallback: true,
+        serviceIntent: false,
+      });
+      appendMessages(sessionId, [
+        { role: "user", content: message },
+        { role: "assistant", content: response.answer },
+      ]);
+      res.end();
+      logger.info("chat.response.ended", { sessionId });
+      return;
+    }
+
+    const pinnedChunks = retrievePinnedServiceChunks(message);
+    let chunks: RetrievedChunk[] = pinnedChunks;
     try {
       logger.info("chat.rag.retrieve.started", { sessionId, topK: 4 });
-      chunks = await retrieve(message, { topK: 4 });
+      const ragChunks = await retrieve(message, { topK: 4 });
+      chunks = mergeRetrievedChunks(pinnedChunks, ragChunks);
       logger.info("chat.rag.retrieve.finished", { sessionId, chunks: chunks.length });
     } catch (err) {
       logger.warn("chat.retrieve.failed", {
@@ -165,64 +474,64 @@ chatRouter.post("/chat", async (req, res) => {
       return;
     }
 
-    let accumulated = "";
-    logger.info("chat.ai.stream.started", {
-      sessionId,
-      timeoutMs: AI_STREAM_TIMEOUT_MS,
-    });
-    const stream = streamChat({
-      message,
-      history,
-      contextChunks: chunks,
-    });
-    const iterator = stream[Symbol.asyncIterator]();
-    const deadline = Date.now() + AI_STREAM_TIMEOUT_MS;
-    let sawFirstToken = false;
+    let accumulated: string | null;
     try {
-      while (true) {
-        if (clientClosed) {
-          await iterator.return?.();
-          return;
-        }
-        const remainingMs = deadline - Date.now();
-        if (remainingMs <= 0) throw new AiGenerationTimeoutError();
-        const next = await nextWithTimeout(iterator.next(), remainingMs);
-        if (next.done) break;
-        const token = next.value;
-        if (!sawFirstToken) {
-          sawFirstToken = true;
-          logger.info("chat.ai.first_token.received", { sessionId, chars: token.length });
-        }
-        accumulated += token;
-        writeEvent(res, "token", token);
-      }
-      logger.info("chat.ai.stream.finished", {
+      accumulated = await collectAiResponseWithTimeout({
+        message,
+        history,
+        contextChunks: chunks,
+        responseLanguage,
         sessionId,
-        responseChars: accumulated.length,
+        clientClosed: () => clientClosed,
       });
     } catch (err) {
-      await iterator.return?.().catch((returnErr: unknown) => {
-        logger.warn("chat.ai.stream.return_failed", {
-          sessionId,
-          error: returnErr instanceof Error ? returnErr.message : String(returnErr),
-        });
-      });
       safeFail("chat.stream.failed", err);
       return;
     }
+    if (accumulated === null) return;
 
-    const finalResponse = parseAgentResponse(accumulated);
-    if (!finalResponse.source) {
+    let finalResponse = parseAgentResponse(accumulated, responseLanguage);
+    if (finalResponse.parseFailed) {
+      logger.warn("chat.ai.parse_failed.retrying", {
+        sessionId,
+        rawPreview: accumulated.slice(0, 240),
+      });
+      const retryMessage = [
+        message,
+        "",
+        "Your previous response was not valid JSON.",
+        "Return the answer again as one valid JSON object only.",
+        "Do not use quotation marks inside string values; use plain words for button names.",
+        "Do not include markdown or text outside JSON.",
+      ].join("\n");
+      try {
+        const retryAccumulated = await collectAiResponseWithTimeout({
+          message: retryMessage,
+          history,
+          contextChunks: chunks,
+          responseLanguage,
+          sessionId,
+          clientClosed: () => clientClosed,
+        });
+        if (retryAccumulated === null) return;
+        finalResponse = parseAgentResponse(retryAccumulated, responseLanguage);
+      } catch (err) {
+        safeFail("chat.retry_stream.failed", err);
+        return;
+      }
+    }
+    finalResponse.language = responseLanguage;
+    cleanFinalResponse(finalResponse);
+
+    if (!finalResponse.source && !isNoInfoAnswer(finalResponse)) {
       const firstSource = chunks[0]?.source ?? null;
       if (firstSource) finalResponse.source = firstSource;
-    }
-    if (finalResponse.documents.length === 0) {
-      finalResponse.documents = Array.from(new Set(chunks.map((c) => c.source)));
     }
 
     // documents[] is the list of papers the user needs (ID, photos, etc.),
     // not sources — only map source through friendlySource.
     finalResponse.source = friendlySource(finalResponse.source);
+    cleanFinalResponse(finalResponse);
 
     writeEvent(res, "done", finalResponse);
     logger.info("chat.response.done_sent", { sessionId, fallback: false });

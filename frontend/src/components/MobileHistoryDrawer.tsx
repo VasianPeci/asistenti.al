@@ -9,6 +9,8 @@ interface MobileHistoryDrawerProps {
   onClose: () => void;
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
+  onRenameConversation: (id: string, title: string) => void;
+  onDeleteConversation: (id: string) => void;
 }
 
 function RefreshIcon(): JSX.Element {
@@ -37,6 +39,8 @@ export default function MobileHistoryDrawer({
   onClose,
   onSelectConversation,
   onNewConversation,
+  onRenameConversation,
+  onDeleteConversation,
 }: MobileHistoryDrawerProps): JSX.Element | null {
   const { t } = useTranslation();
   const conversations = useHistoryStore((s) => s.conversations);
@@ -63,7 +67,7 @@ export default function MobileHistoryDrawer({
         className="absolute inset-x-0 bottom-0 flex flex-col rounded-t-2xl border-t border-border"
         style={{
           background: "#EFEDE8",
-          height: "65vh",
+          height: "min(78vh, 620px)",
           animation: "slideUp 0.22s ease-out both",
         }}
       >
@@ -87,6 +91,8 @@ export default function MobileHistoryDrawer({
               onSelectConversation(id);
               onClose();
             }}
+            onRename={onRenameConversation}
+            onDelete={onDeleteConversation}
           />
         </div>
         <div className="border-t border-border shrink-0">
