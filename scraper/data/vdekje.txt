@@ -1,0 +1,21 @@
+PROCEDURA: Certifikatë nga akti i vdekjes
+INSTITUCIONI: Drejtoria e Përgjithshme e Gjendjes Civile (DPGJC)
+PERSHKRIMI: Ky është një shërbim elektronik që u mundëson qytetarëve shqiptarë të aplikojnë online për certifikatë nga akti i vdekjes së një familjari të tyre, për përdorim brenda vendit ose nga autoritetet e huaja.
+
+HAPAT:
+  1. Identifikohuni si qytetar në portalin e-Albania.
+  2. Zgjidhni shërbimin "Certifikatë nga akti i vdekjes" dhe klikoni butonin "Përdor".
+  3. Përzgjidhni tipin e certifikatës: "Certifikatë aktuale" ose "Certifikatë historike".
+  4. Nëse zgjidhni "Certifikatë aktuale", shkarkoni dokumentin e vulosur në kohë reale. Për certifikatë në gjuhë të huaj, klikoni butonin "Shfaq certifikatën në gjuhë të huaj".
+  5. Nëse zgjidhni "Certifikatë historike" për periudhën "Para vitit 2010", plotësoni të dhënat e kërkuara dhe klikoni "Dërgo". Aplikimi do të shqyrtohet dhe certifikata do të dërgohet në llogarinë tuaj në e-Albania brenda 3 ditëve pune.
+  6. Nëse zgjidhni "Certifikatë historike" për periudhën "Pas vitit 2010", plotësoni të dhënat e shtetasit që ka ndërruar jetë, klikoni "Shfaq certifikatën" dhe më pas "Shkarko dokumentin e vulosur" menjëherë.
+  7. Certifikata e gjeneruar me vulë elektronike mund të gjendet në çdo kohë në seksionin "Dokumentet e mia" në portalin e-Albania.
+
+DOKUMENTET E NEVOJSHME:
+  -  Nuk nevojitet dokumentacion shoqërues për këtë shërbim.
+
+TARIFA: Pa pagesë
+KOHA E PROCESIMIT: Menjëherë (për certifikatat pas 2010); 3 ditë pune (për certifikatat 1923-2010)
+KU TE APLIKONI: Portali e-Albania (e-albania.al)
+
+SHENIME: Dokumentet gjenerohen me vulë elektronike me vlerë të plotë ligjore. Për çdo pyetje apo paqartësi mbi përdorimin e shërbimit, mund të kontaktoni helpdesk@e-albania.al. Për të përdorur këtë shërbim, duhet të identifikoheni ose të krijoni llogari në portal.

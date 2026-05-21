@@ -1,0 +1,33 @@
+PROCEDURA: Aplikim për pasaportë dhe kartë identiteti (për shtetasit shqiptarë që jetojnë jashtë kufijve)
+INSTITUCIONI: Ministria për Evropën dhe Punët e Jashtme
+PERSHKRIMI: Ky është një shërbim elektronik që u mundëson qytetarëve shqiptarë rezidentë jashtë kufijve të Republikës së Shqipërisë, të aplikojnë online për t'u pajisur me pasaportë dhe kartë identiteti. Aplikantët duhet të zgjedhin datën dhe orën e takimit për paraqitje në Ambasadë/Konsullatë.
+
+HAPAT:
+  1. Identifikohuni në portalin e-Albania.
+  2. Zgjidhni shërbimin 'Aplikim për pasaportë dhe kartë identiteti'.
+  3. Klikoni butonin 'Përdor'.
+  4. Zgjidhni nëse do të kryeni një aplikim të ri ose do të gjurmoni statusin e një aplikimi ekzistues.
+  5. Për të gjurmuar statusin, vendosni numrin e aplikimit dhe klikoni 'Kërko'.
+  6. Për të kryer një aplikim të ri, klikoni 'Krijo aplikim të ri', plotësoni të dhënat në formularin elektronik dhe ngarkoni dokumentet e domosdoshme për verifikim.
+  7. Ndiqni procedurat për të kryer pagesën dhe sigurohuni të keni mandatin e pagesës me vete ditën e takimit në Ambasadë/Konsullatë.
+  8. Paraqituni në përfaqësinë diplomatike për të lënë shenjat e gishtërinjve dhe firmosur (e detyrueshme).
+
+DOKUMENTET E NEVOJSHME:
+  - Dokument identifikimi (pasaportë model i vjetër ose leje për drejtim automjeti model elektronik (model i ri) ose dokument me fotografi i lëshuar nga vendi pritës)
+  - Certifikatë lindje (e huaj)
+  - Dokument identifikimi (pasaportë model i vjetër ose dokument me fotografi i lëshuar nga vendi pritës, nëse ka)
+  - Dokument identifikimi (pasaporta dhe karta e identitetit e skaduar)
+  - Dokument identifikimi (pasaporta e skaduar)
+  - Dokument identifikimi (kopje e pasaportës ose kartë identiteti shqiptare ose leje për drejtim automjeti model elektronik (model i ri) ose dokument me fotografi i lëshuar nga vendi pritës)
+  - Denoncimi për humbjen e pasaportës në organet policore të vendit ku ka ndodhur humbja (legalizuar dhe përkthyer)
+  - Denoncimi për humbjen e dokumentit (kartë identiteti dhe pasaporta) në organet policore të vendit ku ka ndodhur humbja
+  - Kopja e pasaportës së dëmtuar ose që i janë mbaruar fletët
+  - Dokument i identifikimit (kartë identiteti shqiptare ose leje për drejtim automjeti model elektronik, model i ri, ose dokument me fotografi i lëshuar nga vendi pritës nëse ka)
+  - Dokument identifikimi (Kartë ID ose Pasaportë ose dokument me fotografi i lëshuar nga vendi pritës)
+  - Certifikatë lindje
+
+TARIFA: E panjohur
+KOHA E PROCESIMIT: 4-6 javë
+KU TE APLIKONI: Portali e-Albania, dhe më pas Ambasada/Konsullata përkatëse e Republikës së Shqipërisë (p.sh., Athinë, Romë, Londër, Bruksel, Stokholm, Berlin, Paris, Selanik, Milano, Bari, Mynih, Stamboll, Nju Jork)
+
+SHENIME: Në rast se nuk paraqiteni në datën e takimit të zgjedhur, takimi anullohet dhe duhet të aplikoni përsëri pas 5 ditësh. E-maili i konfirmimit të aplikimit mund të shkojë në spam/junk. Mbledhja e shumicës së dokumentacionit shoqërues bëhet nga nëpunësit e administratës pas dhënies së aprovimit nga aplikanti. Lista e dokumenteve varion sipas rastit (p.sh., aplikim i ri, rinovim, dëmtim, humbje).

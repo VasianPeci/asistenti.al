@@ -1,0 +1,24 @@
+PROCEDURA: Aplikim i formularit për lëshim për herë të parë ose rinovim të pasaportës
+INSTITUCIONI: Drejtoria e Përgjithshme e Policisë së Shtetit (DPPSH)
+PERSHKRIMI: Ky shërbim elektronik u mundëson qytetarëve shqiptarë të aplikojnë për herë të parë ose të rinovojnë pasaportën e tyre biometrike duke plotësuar një formular identifikimi për Policinë e Shtetit.
+
+HAPAT:
+  1. Identifikohuni si qytetar në portalin e-Albania
+  2. Zgjidhni shërbimin 'Aplikim i formularit për lëshim për herë të parë ose rinovim të pasaportës'
+  3. Klikoni butonin 'Përdor'
+  4. Përzgjidhni tipin e aplikimit ('Aplikim për veten', 'Aplikim për fëmijën nën 16 vjeç' ose 'Aplikim për personin nën kujdestari apo me prokurë')
+  5. Plotësoni fushat e kërkuara në formular dhe ngarkoni dokumentacionin shoqërues të nevojshëm
+  6. Klikoni butonin 'Dërgo' për finalizimin e aplikimit
+  7. Pas shqyrtimit të aplikimit, do të njoftoheni me SMS dhe e-mail për miratimin ose jo të procedurës
+  8. Pjesë e mesazhit të miratimit do të jetë edhe linku ku duhet të rezervoni datën dhe orën për t'u paraqitur fizikisht me qëllim vijimin e aplikimit
+
+DOKUMENTET E NEVOJSHME:
+  - Fotografi në standardin 4x5cm dhe formatin jpg, jpeg ose png
+  - Kopje e kuponit emergjent (në rast se aplikimi është emergjent)
+  - Prokura ose vendim gjyqësor që autorizon kryerjen e aplikimit nga një person tjetër
+
+TARIFA: Pa pagesë
+KOHA E PROCESIMIT: 1 ditë për aplikim emergjent; 1-7 ditë për aplikim normal
+KU TE APLIKONI: Online në portalin e-Albania dhe më pas fizikisht pranë Zyrës së IdentiTek
+
+SHENIME: Riaplikimet për pasaportë biometrike të prodhuar pas datës 31.12.2011 nuk i nënshtrohen plotësimit të këtij formulari, por aplikojnë direkt pranë zyrës së aplikimit. Ditën e paraqitjes fizike, duhet të keni me vete kuponin. Aplikimi mund të kryhet për vete, për fëmijë nën 16 vjeç nga prindërit, ose për personin nën kujdestari/me prokurë. Shumica e dokumentacionit shoqërues sigurohet nga nëpunësit e administratës.

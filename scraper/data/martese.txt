@@ -1,0 +1,24 @@
+PROCEDURA: Aplikim për regjistrim martese
+INSTITUCIONI: Ministria për Evropën dhe Punët e Jashtme
+PERSHKRIMI: Ky është një shërbim elektronik që u mundëson shtetasve shqiptarë të dërgojnë online një kërkesë për regjistrim martese, duke dorëzuar më pas me postë ose personalisht dokumentin e martesës. Pas verifikimeve, qytetarët njoftohen për statusin e aplikimit.
+
+HAPAT:
+  1. Identifikohuni në portalin e-Albania
+  2. Zgjidhni shërbimin “Aplikim për regjistrim martese”
+  3. Klikoni butonin "Përdor"
+  4. Zgjidhni nëse do të kryeni një aplikim të ri apo do të gjurmoni statusin e një aplikimi ekzistues
+  5. Për të gjurmuar statusin e një aplikimi ekzistues, vendosni numrin e aplikimit dhe më pas klikoni butonin "Kërko"
+  6. Për të kryer një aplikim të ri, plotësoni të dhënat personale në formularin elektronik dhe ngarkoni dokumentet që janë të domosdoshme për asistencën që kërkohet. Me anë të e-mail-it të plotësuar në rubrikën përkatëse, do t'ju dërgohet konfirmimi i aplikimit si dhe kodi i veçantë i aplikimit.
+  7. Dorëzoni me postë ose personalisht, dokumentin e lidhjes së martesës.
+  8. Pas verifikimeve të nevojshme të kryera nga përfaqësues të ambasadës/konsullatës, do të njoftoheni me anë të e-mail-it apo nëpërmjet numrit të telefonit
+
+DOKUMENTET E NEVOJSHME:
+  - Certifikata e martesës, lëshuar nga autoritetet e huaja (e legalizuar ose pajisur me vulë apostile)
+  - Përkthimi i certifikatës së martesës, i legalizuar ose pajisur me vulë apostile (nëse nuk e legalizoni apo apostiloni përkthimin e certifikatës, kërkohet që përkthimi në gjuhën shqipe të kryehet në konsullatë ose nëse është kryer përkthimi nga përkthyes të licensuar, duhet që konsulli të lëshojë "vërtetim përkthimi")
+  - Dokumente identifikimi, pasaportë e vlefshme udhëtimi ose letër njoftimi e bashkëshortëve
+
+TARIFA: Pa pagesë
+KOHA E PROCESIMIT: 10 ditë
+KU TE APLIKONI: Portali e-Albania
+
+SHENIME: Mbledhja e dokumentacionit shoqërues kryhet nga nëpunësi i administratës me dhënien e aprovimit. Tarifa e përkthimit apo vërtetimit të përkthimit është 10 euro për faqe dhe është detyrim i qytetarit aplikues. Nëse ka parregullsi në dokumentacion, koha e marrjes së shërbimit zgjat maksimalisht 30 ditë.

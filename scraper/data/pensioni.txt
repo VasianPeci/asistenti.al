@@ -1,0 +1,23 @@
+PROCEDURA: Aplikim për pension pleqërie, suplementar pilot, suplementar lundrues i nëndetëseve apo suplementar për akademik
+INSTITUCIONI: Instituti i Sigurimeve Shoqërore (ISSH)
+PERSHKRIMI: Ky shërbim elektronik ofron mundësinë e aplikimit online për pension pleqërie, si dhe për pensione suplementare për pilotë, lundrues nëndetësesh apo akademikë.
+
+HAPAT:
+  1. Identifikohuni si qytetar në portalin e-Albania
+  2. Zgjidhni shërbimin "Aplikim për pension pleqërie, suplementar pilot, suplementar lundrues i nëndetëseve apo suplementar për akademik"
+  3. Klikoni butonin "Përdor"
+  4. Përzgjidhni llojin e pensionit për të cilën do të parashtroni kërkesën për përfitim
+  5. Plotësoni formularin elektronik me të dhënat e nevojshme mbi periudhat e punësimit, marrëdhëniet financiare si dhe përfitimeve të tjera të nevojshme
+  6. Klikoni butonin “Dërgo” në fund të formularit
+  7. Dokumentet origjinale që keni bashkëlidhur gjatë aplikimit duhet të dërgohen me postë pranë DRSSH përkatëse, duke shoqëruar zarfin me numrin e aplikimit.
+
+DOKUMENTET E NEVOJSHME:
+  - Librezë pune
+  - Diploma e shkollës së lartë
+  - Vendim gjykate për njohje vjetërsie pune
+
+TARIFA: Pa pagesë
+KOHA E PROCESIMIT: 45 ditë
+KU TE APLIKONI: Online në portalin e-Albania; Dokumentet origjinale dërgohen me postë pranë DRSSH përkatëse
+
+SHENIME: Dokumentet e tjera shoqëruese sigurohen nga nëpunësit e administratës pas dhënies së aprovimit nga aplikanti. Ju duhet të identifikoheni ose të krijoni llogari në portalin e-Albania për të përdorur shërbimin.

@@ -1,0 +1,26 @@
+PROCEDURA: Aplikim për regjistrimin fillestar të personit fizik
+INSTITUCIONI: Qendra Kombëtare e Biznesit (QKB)
+PERSHKRIMI: Ky shërbim elektronik mundëson regjistrimin fillestar të individëve (person fizik) që kërkojnë të ushtrojnë një veprimtari tregtare, duke i ofruar mundësinë qytetarëve shqiptarë ose të huaj të aplikojnë online.
+
+HAPAT:
+  1. Identifikohuni si shtetas shqiptar ose shtetas i huaj (Aplikanti duhet të jetë i pajisur me nënshkrim elektronik)
+  2. Zgjidhni shërbimin "Aplikim për regjistrimin fillestar të personit fizik / Application for the initial registration of the physical person"
+  3. Klikoni butonin "Përdor"
+  4. Plotësoni formularin elektronik me të dhënat e nevojshme mbi subjektin
+  5. Ngarko dokumentacionin e nevojshëm
+  6. Klikoni butonin “Dërgo” në faqen e fundit të formularit
+  7. Klikoni butonin “ Dërgo kodin e nënshkrimit”
+  8. Vendos kodin e nënshkrimit dhe kliko butonin “Nënshkruaj”
+  9. Shqyrtimi i aplikimit bëhet nga nëpunësi i autorizuar i QKB-së
+  10. Pas vlerësimit të aplikimit merret vendimi nga nëpunësi i autorizuar (Pezullim/Miratim/Refuzim)
+  11. Përgjigja dërgohet tek subjekti aplikues, me email dhe tek ”Hapësira Ime” në portalin e-Albania
+
+DOKUMENTET E NEVOJSHME:
+  -  Akti i përfaqësimit, në formën e kërkuar nga ligji, nëse aplikanti është i ndryshëm nga personi që legjitimohet të kryejë regjistrimin
+  -  Aktet e tjera të nevojshme për regjistrimin, sipas legjislacionit në fuqi
+
+TARIFA: Pa pagesë
+KOHA E PROCESIMIT: 1 ditë pune
+KU TE APLIKONI: Portali e-Albania
+
+SHENIME: Aplikanti duhet të jetë i pajisur me nënshkrim elektronik. Dokumentacioni shoqërues (p.sh. akti i përfaqësimit) sigurohet nga nëpunësit e administratës dhe nuk kërkohet të ngarkohet nga aplikanti. Përpara marrjes së NIPT-it, është thelbësore të njiheni me inspektoriatet përgjegjëse, bazën ligjore dhe detyrimet specifike sipas fushës së veprimtarisë së biznesit.

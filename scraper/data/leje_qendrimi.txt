@@ -1,0 +1,27 @@
+PROCEDURA: Kërkesë për rinovim të lejes së qëndrimit
+INSTITUCIONI: Drejtoria e Përgjithshme e Policisë së Shtetit (DPPSH)
+PERSHKRIMI: Ky shërbim elektronik u mundëson shtetasve të huaj, që kanë qëndruar në territorin e Shqipërisë në mënyrë të rregullt për mbi 180 ditë gjatë një viti kalendarik, të aplikojnë për rinovimin e lejes së tyre të qëndrimit.
+
+HAPAT:
+  1. Zgjidhni shërbimin "Kërkesë për rinovim të lejes së qëndrimit" në portalin e-Albania.
+  2. Klikoni butonin "Përdor".
+  3. Plotësoni saktë formularin elektronik me të dhënat e nevojshme.
+  4. Ngarkoni në formatin e përcaktuar të gjitha dokumentet e listuara në formular.
+  5. Konfirmoni saktësinë e informacionit dhe klikoni butonin “Dërgo”.
+  6. Shkarkoni dhe printoni formularin e plotësuar me foton tuaj personale.
+  7. Pas njoftimit elektronik për pranimin e aplikimit, paguani tarifën e lejes së qëndrimit brenda 24 orëve në një bankë të nivelit të dytë.
+  8. Brenda 7 ditësh nga njoftimi, dërgoni dokumentacionin origjinal, 2 fotografi, mandatin e pagesës dhe formularin e nënshkruar nëpërmjet shërbimit postar.
+  9. Pas miratimit të lejes së qëndrimit, paraqituni personalisht në zyrën vendore të migracionit për të aplikuar për kartën biometrike.
+
+DOKUMENTET E NEVOJSHME:
+  - Dokumentacioni origjinal (specifikuar sipas motivit të qëndrimit)
+  - Dy fotografi në format pasaporte, me sfond të bardhë, të bëra në 6-mujorin e fundit
+  - Mandat pagese i tarifës së shërbimit (dhe i gjobave, nëse ka, për shkelje afati)
+  - Formulari i plotësuar dhe nënshkruar nga aplikanti (i printuar nga platforma e-Albania)
+  - Dokumente nga vendi i origjinës të përkthyera dhe legalizuara (në varësi të motivit të qëndrimit)
+
+TARIFA: E panjohur
+KOHA E PROCESIMIT: 30 ditë
+KU TE APLIKONI: Online në portalin e-Albania; për kartën biometrike, paraqitje personale në zyrën vendore të migracionit.
+
+SHENIME: Aplikimi duhet të bëhet brenda 60 ditëve përpara përfundimit të lejes së qëndrimit aktuale. Aplikanti duhet të jetë prezent në Shqipëri gjatë aplikimit dhe të ketë qëndrim të rregullt. Një adresë personale e-mail është e domosdoshme për komunikim; përdorimi i gabuar çon në refuzim. Moskryerja e pagesës së tarifës ose mosdërgimi i dokumentacionit me postë brenda afateve të caktuara çon në refuzimin e kërkesës. Pas dërgimit të dokumentacionit dhe pagesës, lëshohet një leje qëndrimi provizore elektronike, e vlefshme deri në 2 muaj.

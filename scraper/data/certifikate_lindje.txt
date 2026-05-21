@@ -1,0 +1,23 @@
+PROCEDURA: Certifikatë nga akti i lindjes
+INSTITUCIONI: Drejtoria e Përgjithshme e Gjendjes Civile (DPGJC)
+PERSHKRIMI: Ky është një shërbim elektronik që u mundëson qytetarëve shqiptarë të aplikojnë online dhe të gjenerojnë certifikatë nga akti i lindjes me vulë elektronike me vlefshmëri të plotë ligjore. Shërbimi mundëson gjenerimin e dokumentit për akte të mbajtura para dhe pas vitit 2010.
+
+HAPAT:
+  1. Identifikohuni si qytetar në portalin e-Albania
+  2. Zgjidhni shërbimin "Certifikatë nga akti i lindjes”
+  3. Klikoni butonin "Përdor"
+  4. Përzgjidhni tipin e certifikatës për periudhën aktuale duke zgjedhur “Certifikatë aktuale” apo për periudhën historike duke zgjedhur “Certifikatë historike”
+  5. Në rastin e certifikatës aktuale, gjenerimi i saj bëhet në kohë reale duke klikuar butonin “Shkarko dokumentin e vulosur”
+  6. Në rastin e certifikatës historike duhet të përzgjidhjet periudha “Para vitit 2010” ose “Pas vitit 2010”, në varësi të periudhës për të cilën ju nevojitet certifikata
+  7. Për periudhën “Para vitit 2010” duhet të plotësohet seksioni me të dhënat e kërkuara dhe në fund klikoni butonin "Dërgo"
+  8. Pasi aplikimi të dërgohet me sukses, do të merret në shqyrtim nga zyra e gjendjes civile përkatëse dhe certifikata do të dërgohet brenda 3 (tre) ditëve pune në llogarinë tuaj në portalin qeveritar e-Albania, në rubrikën “Dokumentet e mia”
+  9. Për periudhën “Pas vitit 2010” duhet të përzgjidhjet anëtari i familjes për të cilin kërkohet certifikata dhe të klikoni butonin "Shfaq certifikatën". Certifikata do të gjenerohet menjëherë nga Regjistri Kombëtar i Gjendjes Civile (RKGjC) i vitit 2010. Për shkarkimin e certifikatës nga akti i lindjes klikoni butonin "Shkarko dokumentin e vulosur".
+
+DOKUMENTET E NEVOJSHME:
+  -  Nuk nevojitet dokumentacion shoqërues për këtë shërbim.
+
+TARIFA: Pa pagesë
+KOHA E PROCESIMIT: 3 ditë pune
+KU TE APLIKONI: Portali e-Albania
+
+SHENIME: Për të përdorur këtë shërbim, duhet të identifikoheni ose të krijoni llogari në portalin e-Albania. Certifikatat për aktet e mbajtura pas vitit 2010 gjenerohen menjëherë. Për çdo pyetje apo paqartësi mund të kontaktoni në helpdesk@e-albania.al.

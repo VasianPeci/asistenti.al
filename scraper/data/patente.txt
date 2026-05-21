@@ -1,0 +1,19 @@
+PROCEDURA: Vërtetim për lejen e drejtimit
+INSTITUCIONI: Drejtoria e Përgjithshme e Shërbimeve të Transportit Rrugor (DPSHTRR)
+PERSHKRIMI: Ky është një shërbim elektronik që u vjen në ndihmë qytetarëve për të aplikuar online për vërtetim për lejen e drejtimit. Ky vërtetim lëshohet me kërkesë të qytetarit për t'u përdorur në institucionet brenda vendit.
+
+HAPAT:
+  1. Identifikohuni si qytetar në portalin e-Albania
+  2. Zgjidhni shërbimin "Vërtetim për lejen e drejtimit"
+  3. Klikoni butonin "Përdor"
+  4. Plotësoni formularin elektronik me të dhënat e nevojshme të kërkuara, duke zgjedhur llojin e vërtetimit me të cilin kërkoni të pajiseni
+  5. Klikoni butonin "Shkarko dokumentin e vulosur" për të gjeneruar vërtetimin me vulë elektronike
+
+DOKUMENTET E NEVOJSHME:
+  -  Nuk nevojitet dokumentacion shoqërues për këtë shërbim.
+
+TARIFA: Pa pagesë
+KOHA E PROCESIMIT: Menjëherë
+KU TE APLIKONI: Online në portalin e-Albania
+
+SHENIME: Shërbimi ofrohet online me vulë elektronike me vlerë të plotë ligjore. Për të përdorur shërbimin, ju duhet të identifikoheni ose të krijoni llogari në e-Albania.

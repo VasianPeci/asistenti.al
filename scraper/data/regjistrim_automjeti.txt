@@ -1,0 +1,29 @@
+PROCEDURA: Aplikim për regjistrim mjeti/motomjeti
+INSTITUCIONI: Drejtoria e Përgjithshme e Shërbimeve të Transportit Rrugor (DPSHTRR)
+PERSHKRIMI: Ky është një shërbim elektronik që u vjen në ndihmë qytetarëve ose bizneseve për të aplikuar online për regjistrimin e një mjeti ose motomjeti të tyre.
+
+HAPAT:
+  1. Identifikohuni si qytetar ose biznes në portalin e-Albania
+  2. Zgjidhni shërbimin "Aplikim për regjistrim mjeti/motomjeti"
+  3. Klikoni butonin "Përdor"
+  4. Plotësoni formularin elektronik me të dhënat e nevojshme të kërkuara në formular
+  5. Klikoni butonin “Dërgo” në fund të formularit
+  6. Punonjësi i DRSHTRR njoftohet elektronikisht për mbërritjen e një aplikimi të ri dhe bën verifikimin për saktësinë e dokumenteve
+  7. Në rast se dokumetet janë të sakta punonjësi i DPSHTRR i kthen përgjigje qytetarit duke konfirmuar aplikimin
+  8. Nëse ka pasaktësi ose mungesë dokumentesh, punonjësi i DRSHTRR njofton aplikantin për pasaktësitë dhe e udhëzon për të riplotësuar praktikën e aplikimit
+  9. Në rastin e konfirmimit nga punonjësi i DRSHTRR ju do të rezervoni një orar për dorëzimin e dokumentave fizikisht
+  10. Në orarin e rezervuar do të paraqiteni në sportelin e drejtorisë ku keni bërë aplikimin
+
+DOKUMENTET E NEVOJSHME:
+  - Autorizim nga Ambasada për aplikuesin
+  - Autorizim nga individi për aplikuesin
+  - Prokurë e posaçme
+  - Konfirmimi nga RBS
+  - Siguracion i mjetit
+  - Dokumenti i origjinës së mjetit të përkthyera e noterizuara (kur mjeti është blerë jashtë vendit)
+
+TARIFA: 5100 ALL
+KOHA E PROCESIMIT: 66 ditë pune
+KU TE APLIKONI: Portali e-Albania, pastaj fizikisht në sportelin e drejtorisë ku është bërë aplikimi
+
+SHENIME: Mbledhja e dokumentacionit shoqërues (lejedrejtimi, kontrolli fizik) që më parë ishte detyrim të dorëzohej nga aplikanti, tani është detyrë e nëpunësit të administratës. Regjistrimi i mjetit nuk ka afat në kohë.

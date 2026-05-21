@@ -1,0 +1,62 @@
+Refuzo
+Prano
+Menu
+NGJARJET E JETËS
+SHËRBIMET MË TË PËRDORURA
+KATEGORITË E SHËRBIMEVE
+SHËRBIMET SIPAS INSTITUCIONEVE
+DOKUMENTE ME VULË
+PAGESA ELEKTRONIKE
+Historia e e-Albania
+Ndihmë dhe suport
+Institucionet
+Hapësira ime Publike
+Regjistrohu
+Certifikatë nga akti i lindjes
+Rreth shërbimit
+Me vulë digjitale
+Për qytetar
+Ky është një shërbim elektronik që u mundëson qytetarëve shqiptarë të aplikojnë online dhe të gjenerojnë certifikatë nga akti i lindjes me vulë elektonike me vlefshmëri të plotë ligjore.
+Drejtoria e Përgjithshme e Gjendjes Civile (DPGJC)
+E-mail:
+Adresa: Sheshi “Skenderbej” Nr. 3 Tirane , Tiranë
+Përshkrimi i shërbimit
+Shërbimi elektronik "Certifikatë nga akti i lindjes" u mundëson shtetasve të aplikojnë online dhe të gjenerojnë dokumentin certifikatë nga akti i lindjes me vulë elektronike sipas tipologjisë:
+• Në rastin kur akti i lindjes është mbajtur “Pas vitit 2010”, certifikata nga akti i lindjes do të mundësohet nga Regjistri Kombëtar i Gjendjes Civile (RKGjC) i vitit 2010.
+• Në rastin kur akti i lindjes është mbajtur “Para vitit 2010”, certifikata nga akti i lindjes (për përdorim brenda vendit/për përdorim nga autoritetet e huaja) e kërkuar për periudhën nga viti 1923 deri në vitin 2010 do të mundësohet nga zyra e gjendjes civile përkatëse.
+Në rastet kur shtetasi ka lindur pas vitit 2010, dokumenti certifikatë nga akti i lindjes do të shfaqet menjëherë. Certifikata gjenerohet me vulë elektronike me vlerë të plotë ligjore.
+Baza ligjore:
+Certifikata gjenerohet, me vulë elektronike të Drejtorisë së Përgjithshme të Gjendjes Civile, si një dokument me vlerë të plotë ligjore, në përputhje me legjislacionin në fuqi, për shërbimet e besuara, bazuar në vendimin nr.495, datë 13.09.2017, të Këshillit të Ministrave “Për miratimin e rregullave të përfitimit të shërbimeve publike elektronike”, si dhe në vendimin nr.332, datë 17.03.2010, të Këshillit të Ministrave, “Për përcaktimin e formës, elementëve përbërës, mënyrës së mbajtjes e afatit të përdorimit të dokumenteve bazë, që mbahen dhe lëshohen nga shërbimi i gjendjes civile”, të ndryshuar.
+Dokumentacioni i nevojshëm
+Nuk nevojitet dokumentacion shoqërues për këtë shërbim.
+Hapat e procedurës
+- Identifikohuni si qytetar në portalin e-Albania;
+- Zgjidhni shërbimin "Certifikatë nga akti i lindjes”;
+- Klikoni butonin "Përdor";
+- Përzgjidhni tipin e certifikatës për periudhën aktuale duke zgjedhur “Certifikatë aktuale” apo për periudhën historike duke zgjedhur “Certifikatë historike”;
+- Në rastin e certifikatës aktuale, gjenerimi i saj bëhet në kohë reale duke klikuar butonin “Shkarko dokumentin e vulosur”.
+- Në rastin e certifikatës historike duhet të përzgjidhet periudha “Para vitit 2010” ose “Pas vitit 2010”, në varësi të periudhës për të cilën ju nevojitet certifikata;
+- Për periudhën “Para vitit 2010” duhet të plotësohet seksioni me të dhënat e kërkuara dhe në fund klikoni butonin "Dërgo";
+- Pasi aplikimi të dërgohet me sukses, do të merret në shqyrtim nga zyra e gjendjes civile përkatëse dhe certifikata do të dërgohet brenda 3 (tre) ditëve pune në llogarinë tuaj në portalin qeveritar e-Albania, në rubrikën “Dokumentet e mia”;
+- Për periudhën “Pas vitit 2010” duhet të përzgjidhet anëtari i familjes për të cilin kërkohet certifikata dhe të klikoni butonin "Shfaq certifikatën". Certifikata do të gjenerohet menjëherë nga Regjistri Kombëtar i Gjendjes Civile (RKGjC) i vitit 2010. Për shkarkimin e certifikatës nga akti i lindjes klikoni butonin "Shkarko dokumentin e vulosur".
+Koha e nevojshme e marrjes së shërbimit
+“Certifikata nga akti i lindjes” pas vitit 2010, gjenerohet menjëherë.
+“Certifikata nga akti i lindjes” për periudhën 1923 - 2010, lëshohet brenda 3 (tre) ditëve pune.
+Periudha e vlefshmërisë
+Pa afat
+Kostot e shërbimit
+Pa pagesë
+Informacione shtesë
+Për çdo pyetje apo paqartësi mbi përdorimin e shërbimit mund të kontaktoni në adresën helpdesk@e-albania.al
+Për të përdorur këtë shërbim, ju duhet të identifikoheni ose të krijoni llogari duke klikuar butonin 'Hyr' ose 'Regjistrohu'!
+Regjistrohu
+eAlbania
+e-Albania është portali qeveritar që shërben për marrjen në mënyrë elektronike të shërbimeve publike nga institucionet shtetërore. Dhënia e shërbimeve bëhet e mundur falë Platformës Qeveritare të Ndërveprimit, që ndërlidh sistemet e institucioneve me njëri-tjetrin. Portali luan rolin e një zyre elektronike me një ndalesë, ku qytetari regjistrohet duke përdorur numrin e tij të identitetit (NID), për të marrë shërbimin e nevojshëm nga institucionet publike.
+E RËNDËSISHME!
+Të dhënat e përdoruesve në portalin e-Albania shfaqen automatikisht nga databazat e institucioneve që i administrojnë ato. Në asnjë rast e-Albania nuk modifikon të dhënat e publikuara
+© Maj 2026, Agjencia Kombëtare e Shoqërisë se Informacionit. Të gjitha të drejtat e rezervuara.
+Ndihmë për përdorimin e portalit
+Politikat e Privatësisë
+Informacioni
+Festat zyrtare
+Kontaktoni

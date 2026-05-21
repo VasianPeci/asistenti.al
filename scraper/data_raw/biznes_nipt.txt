@@ -1,0 +1,69 @@
+Refuzo
+Prano
+Menu
+NGJARJET E JETËS
+SHËRBIMET MË TË PËRDORURA
+KATEGORITË E SHËRBIMEVE
+SHËRBIMET SIPAS INSTITUCIONEVE
+DOKUMENTE ME VULË
+PAGESA ELEKTRONIKE
+Historia e e-Albania
+Ndihmë dhe suport
+Institucionet
+Hapësira ime Publike
+Regjistrohu
+Aplikim për regjistrimin fillestar të personit fizik
+Rreth shërbimit
+Për qytetar
+Ky shërbim elektronik mundëson regjistrimin e individëve, të cilët kërkojnë të ushtrojnë një veprimtari tregtare si person fizik.
+Qendra Kombëtare e Biznesit (QKB)
+E-mail: info.qkb@qkb.gov.al
+Adresa: Bulevardi “Zhan D’Ark”, Prona nr.33, Shtëpia e Ushtarakëve, Tiranë
+Përshkrimi i shërbimit
+Shërbimi elektronik i regjistrimit fillestar të një subjekti i ofrohet një qytetari shqiptar ose të huaj për të kryer aplikimin për regjistrim fillestar. (Një nga subjektet që detyrohen të regjistrohen në regjistrin tregtar janë personat fizikë, që ushtrojnë veprimtari ekonomike tregtare).
+Baza ligjore:
+- Ligji nr. 9723, datë 03.05.2007, “Për Regjistrimin e Biznesit”, i ndryshuar;
+- Kodi Civil;
+- Ligji nr.9920, datë: 19.05.2008, "Procedurat Tatimore në Republikën e Shqipërisë”, i ndryshuar;
+- Ligji nr. 9880 datë 25.2.2008 “Për nënshkrimin elektronik”;
+- Ligji nr. 10273 datë 29.4.2010 “Për dokumentin elektronik” dhe aktet nënligjore në zbatim të këtyre ligjeve.
+Për vëmendje!
+Përpara se të pajiseni me NIPT, ju lutemi të merrni në konsideratë se çdo lloj biznesi monitorohet nga inspektoriate të ndryshme, sipas fushës së veprimtarisë. Për secilin subjekt është e detyrueshme të njiheni me inspektoriatin përgjegjës që do të kryejë kontrollin dhe mbikëqyrjen e aktivitetit tuaj, bazën ligjore mbi të cilën mbështetet veprimtaria e inspektoriatit, dokumentacionin e domosdoshëm që duhet të disponojë subjekti për të ushtruar aktivitetin në përputhje me ligjin, afatet e rifreskimit të dokumentacionit (periodicitetin e përditësimit), penalitetet dhe gjobat që parashikohen në rast të mosrespektimit të detyrimeve ligjore, si dhe detyrimin për raportim pranë inspektoriatit , cilin raport apo dokument duhet të dorëzojë subjekti.
+Ky informacion është i domosdoshëm për të siguruar që aktiviteti juaj të zhvillohet në përputhje me legjislacionin dhe për të shmangur penalitetet. Për të shkarkuar dokumentin e plotë me detyrimet sipas llojit të biznesit, klikoni këtu.
+Dokumentacioni i nevojshëm
+Dokumente që sigurohen nga nëpunësit e administratës	Dokumente që ngarkohen nga aplikanti
+1. Akti i përfaqësimit, në formën e kërkuar nga ligji, nëse aplikanti është i ndryshëm nga personi që legjitimohet të kryejë regjistrimin
+2. Aktet e tjera të nevojshme për regjistrimin, sipas legjislacionit në fuqi
+* Mbledhja e dokumentacionit shoqërues të mësipërm që më parë ishte detyrim të dorëzohej në zyrat e shtetit nga vetë aplikanti, tani është detyrë e nëpunësit të administratës ndaj qytetarit. Me dhënien e aprovimit, ju bini dakord që këto dokumente të sigurohen për ju nga nëpunësi i administratës.
+Hapat e procedurës
+- Identifikohuni si shtetas shqiptar ose shtetas i huaj
+(Kujdes: Aplikanti, duhet të jetë i pajisur me nënshkrim elektronik);
+- Zgjidhni shërbimin "Aplikim për regjistrimin fillestar të personit fizik / Application for the initial registration of the physical person”
+- Klikoni butonin "Përdor";
+- Plotësoni formularin elektronik me të dhënat e nevojshme mbi subjektin
+- Ngarko dokumentacionin e nevojshëm;
+- Klikoni butonin “Dërgo” në faqen e fundit të formularit;
+- Klikoni butonin “ Dërgo kodin e nënshkrimit”;
+- Vendos kodin e nënshkrimit dhe kliko butonin “Nënshkruaj”
+- Shqyrtimi i aplikimit bëhet nga nëpunësi i autorizuar i QKB-së;
+- Pas vlerësimit të aplikimit merret vendimi nga nëpunësi i autorizuar ( Pezullim/Miratim/ Refuzim);
+- Përgjigja dërgohet tek subjekti aplikues, me email, në mënyrë automatike nga sistemi dhe po ashtu tek ”Hapësira Ime” në portalin e-Albania.
+Koha e nevojshme e marrjes së shërbimit
+QKB, pasi kryen verifikimet përkatëse, sipas nenit 54 të ligjit nr.9723/2007 dhe vëren përmbushjen e kushteve për regjistrim, kryen regjistrimin në regjistër dhe lëshon vërtetimin e kryerjes së regjistrimeve të tjera brenda një afati prej një dite nga data e paraqitjes së aplikimit.Sqarim: Për aplikimet e kryera gjatë ditëve të pushimit zyrtar afati për shqyrtimin e aplikimin fillon me fillimin e orarit zyrtar të punës për ditën pasardhëse.
+Periudha e vlefshmërisë
+Në rastin e miratimit të aplikimit, lëshohet vërtetimi i miratimit të aplikimit, i cili nuk ka afat.
+Kostot e shërbimit
+Pa pagesë
+Informacione shtesë
+Për çdo pyetje apo paqartësi mbi përdorimin e shërbimit mund të kontaktoni në adresën helpdesk@e-albania.al
+Përdor
+eAlbania
+e-Albania është portali qeveritar që shërben për marrjen në mënyrë elektronike të shërbimeve publike nga institucionet shtetërore. Dhënia e shërbimeve bëhet e mundur falë Platformës Qeveritare të Ndërveprimit, që ndërlidh sistemet e institucioneve me njëri-tjetrin. Portali luan rolin e një zyre elektronike me një ndalesë, ku qytetari regjistrohet duke përdorur numrin e tij të identitetit (NID), për të marrë shërbimin e nevojshëm nga institucionet publike.
+E RËNDËSISHME!
+Të dhënat e përdoruesve në portalin e-Albania shfaqen automatikisht nga databazat e institucioneve që i administrojnë ato. Në asnjë rast e-Albania nuk modifikon të dhënat e publikuara
+© Maj 2026, Agjencia Kombëtare e Shoqërisë se Informacionit. Të gjitha të drejtat e rezervuara.
+Ndihmë për përdorimin e portalit
+Politikat e Privatësisë
+Informacioni
+Festat zyrtare
+Kontaktoni

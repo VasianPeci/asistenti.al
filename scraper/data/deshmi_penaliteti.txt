@@ -1,0 +1,24 @@
+PROCEDURA: Aplikim për vërtetimin e verifikimit të gjendjes gjyqësore (Dëshmi Penaliteti)
+INSTITUCIONI: Ministria për Evropën dhe Punët e Jashtme
+PERSHKRIMI: Ky aplikim u mundëson shtetasve shqiptarë rezidentë jashtë Shqipërisë të marrin vërtetimin e gjendjes gjyqësore (Dëshmi Penaliteti) me postë, duke aplikuar online pranë përfaqësive diplomatike dhe konsullore. Shërbimi përfshin verifikimin e gjendjes gjyqësore sipas Regjistrit Gjyqësor pranë Ministrisë së Drejtësisë.
+
+HAPAT:
+  1. Identifikohuni në portalin e-Albania.
+  2. Zgjidhni shërbimin “Aplikim për vërtetimin e verifikimit të gjendjes gjyqësore (Dëshmi Penaliteti)".
+  3. Klikoni butonin "Përdor".
+  4. Plotësoni të dhënat personale dhe ngarkoni dokumentet e domosdoshme për verifikim të identitetit (p.sh., fotokopje të kartës së identitetit ose pasaportës).
+  5. Pas pranimit të aplikimit, do të njoftoheni me e-mail mbi procedurat e mëtejshme, duke përfshirë kryerjen e pagesës dhe dërgimin me postë të dokumenteve origjinale të kërkuara.
+  6. Dërgoni me postë dokumentet e kërkuara si autorizimin e nënshkruar origjinal, mandatin origjinal dhe një zarf me pullë të parapaguar me adresën tuaj.
+  7. Pas kryerjes së verifikimeve përkatëse, do të njoftoheni me e-mail për përfundimin e aplikimit dhe dërgimin e vërtetimit me postë në adresën e shënuar.
+
+DOKUMENTET E NEVOJSHME:
+  - Fotokopje e kartës së identitetit ose pasaportës (ngarkohet online)
+  - Autorizim i nënshkruar origjinal (dërgohet me postë)
+  - Mandat origjinal (dërgohet me postë)
+  - Zarf me pullë të parapaguar dhe adresën e shënuar (dërgohet me postë)
+
+TARIFA: E panjohur
+KOHA E PROCESIMIT: 10 ditë, ose deri në 30 ditë në rast parregullsie në dokumentacion
+KU TE APLIKONI: Online në portalin e-Albania, nëpërmjet përfaqësive diplomatike dhe konsullore
+
+SHENIME: Luten të interesuarit të kontrollojnë rregullisht e-mail-in për njoftime dhe përditësime të statusit të aplikimit. Mbledhja e dokumentacionit shoqërues nga ana e administratës bëhet me aprovimin e aplikantit.
