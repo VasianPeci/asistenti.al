@@ -1,0 +1,50 @@
+{
+  "app": {
+    "title": "Asistenti.al",
+    "tagline": "Pyetni çdo gjë për shërbimet publike",
+    "subtext": "Asistenti juaj digjital — i qetë, i saktë, gjithmonë i gatshëm.",
+    "builtWith": "Ndërtuar me",
+    "aiLabel": "Gemini"
+  },
+  "input": {
+    "placeholder": "Shkruaj pyetjen tënde...",
+    "send": "Dërgo",
+    "kbHint": "Enter dërgon · Shift+Enter rresht i ri"
+  },
+  "suggestions": {
+    "business": "Si të hap një biznes?",
+    "passport": "Si të rinovoj pasaportën?",
+    "license": "Si të aplikoj për patentë?",
+    "vehicle": "Si të regjistrojë automjetin tim?",
+    "residence": "Si të marr leje qëndrimi?",
+    "marriage": "Çfarë dokumentesh nevojiten për martesë?",
+    "birthCertificate": "Si të marr certifikatën e lindjes?",
+    "tax": "Si të pajisem me NIPT?"
+  },
+  "chat": {
+    "thinking": "Duke menduar",
+    "error": "Nuk mund të gjej një përgjigje tani. Ju lutemi provoni përsëri.",
+    "documentsRequired": "Dokumentet e nevojshme",
+    "source": "Burim",
+    "noInfo": "Më vjen keq, nuk gjeta informacion të mjaftueshëm për këtë pyetje.",
+    "retry": "Provoni përsëri",
+    "copy": "Kopjo",
+    "copied": "U kopjua",
+    "steps": "Hapat",
+    "progress": "{{done}} / {{total}} hapa të kryera",
+    "assistantLabel": "Asistenti.al"
+  },
+  "history": {
+    "title": "Bisedat",
+    "newConversation": "Bisedë e re",
+    "clear": "Pastro bisedën",
+    "clearConfirm": "Filloni një bisedë të re? Biseda aktuale do të mbetet në histori.",
+    "today": "Sot",
+    "yesterday": "Dje",
+    "earlier": "Më parë",
+    "empty": "Ende pa biseda"
+  },
+  "language": {
+    "toggle": "Ndrysho gjuhën"
+  }
+}

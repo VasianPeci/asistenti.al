@@ -1,0 +1,50 @@
+{
+  "app": {
+    "title": "Asistenti.al",
+    "tagline": "Ask anything about public services",
+    "subtext": "Your digital assistant — calm, precise, always ready.",
+    "builtWith": "Built with",
+    "aiLabel": "Gemini"
+  },
+  "input": {
+    "placeholder": "Type your question...",
+    "send": "Send",
+    "kbHint": "Enter to send · Shift+Enter for new line"
+  },
+  "suggestions": {
+    "business": "How do I open a business?",
+    "passport": "How do I renew my passport?",
+    "license": "How do I apply for a driver's license?",
+    "vehicle": "How do I register a vehicle?",
+    "residence": "How do I get a residence permit?",
+    "marriage": "What documents are needed for marriage?",
+    "birthCertificate": "How do I get a birth certificate?",
+    "tax": "How do I get a tax ID (NIPT)?"
+  },
+  "chat": {
+    "thinking": "Thinking",
+    "error": "I couldn't find an answer right now. Please try again.",
+    "documentsRequired": "Documents required",
+    "source": "Source",
+    "noInfo": "Sorry, I couldn't find enough information about this question.",
+    "retry": "Try again",
+    "copy": "Copy",
+    "copied": "Copied",
+    "steps": "Steps",
+    "progress": "{{done}} / {{total}} steps completed",
+    "assistantLabel": "Asistenti.al"
+  },
+  "history": {
+    "title": "Conversations",
+    "newConversation": "New conversation",
+    "clear": "Clear conversation",
+    "clearConfirm": "Start a new conversation? Your current chat will stay in history.",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "earlier": "Earlier",
+    "empty": "No conversations yet"
+  },
+  "language": {
+    "toggle": "Toggle language"
+  }
+}

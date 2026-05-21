@@ -1,0 +1,8 @@
+node_modules/
+.env
+.env.*
+data/docs/
+**/*.test.ts
+dist/
+.DS_Store
+*.log

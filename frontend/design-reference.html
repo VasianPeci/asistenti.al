@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistenti.al — Design Spec</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #DDDBD4; -webkit-font-smoothing: antialiased; }
+    #root { min-height: 100vh; }
+    textarea { font-family: inherit; }
+    ::selection { background: rgba(200,16,46,0.12); }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #C8C7C0; border-radius: 2px; }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes dotPulse { 0%,66%,100% { opacity:.2; transform:scale(.72); } 33% { opacity:1; transform:scale(1); } }
+    @keyframes checkPop { 0% { transform:scale(0) rotate(-6deg); } 55% { transform:scale(1.28) rotate(2deg); } 100% { transform:scale(1) rotate(0); } }
+    @keyframes blink    { 0%,49% { opacity:1; } 50%,100% { opacity:0; } }
+    @keyframes slideUp  { from { transform:translateY(100%); } to { transform:translateY(0); } }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useMemo } = React;
+
+/* ── Tokens ── */
+const BG='#F5F4EF', FG='#1A1A1A', ACCENT='#C8102E', GRAY='#6B6B6B', MUTED='#AAAAAA', BORDER='#E4E4E0', SOFT='#F0F0ED', PAGE='#DDDBD4';
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{"accent":"#C8102E"}/*EDITMODE-END*/;
+const ACCENT_OPTS = [{label:'Albanian Red',hex:'#C8102E'},{label:'Institutional Blue',hex:'#1B5299'},{label:'Government Green',hex:'#1B6647'}];
+
+/* ── Translations ── */
+const T = {
+  al: {
+    headline:'Pyetni çdo gjë për\nshërbimet publike', subtext:'Asistenti juaj digjital — i qetë, i saktë, gjithmonë i gatshëm.',
+    placeholder:'Shkruaj pyetjen tënde...', builtWith:'Ndërtuar me', aiLabel:'Gemini', newChat:'Bisedë e re', thinking:'Duke menduar',
+    suggestions:['Si të hap një biznes?','Si të rinovoj pasaportën?','Si të aplikoj për patentë?','Si të regjistrojë automjetin?','Si të marr leje qëndrimi?'],
+    passportQ:'Si të rinovoj pasaportën?',
+    streamText:'Për të rinovuar pasaportën tuaj shqiptare, duhet të aplikoni pranë Drejtorisë së Përgjithshme të Gjendjes Civile (DPGJC). Mund të paraqiteni pranë çdo komisariati policie ose sportel DPGJC...',
+    kbHint:'Enter dërgon · Shift+Enter rresht i ri',
+    tryAgain:'Provo përsëri',
+    errorMsg:'Nuk mund të gjej një përgjigje tani. Ju lutemi provoni përsëri.',
+    errorQ:'Si të hapni leje ndërtimi?',
+  },
+  en: {
+    headline:'Ask anything about\npublic services', subtext:'Your digital assistant — calm, precise, always ready.',
+    placeholder:'Type your question...', builtWith:'Built with', aiLabel:'Gemini', newChat:'New conversation', thinking:'Thinking',
+    suggestions:['How do I open a business?','How do I renew my passport?','How do I apply for a driver\'s license?','How do I register a vehicle?','How do I get a residence permit?'],
+    passportQ:'How do I renew my passport?',
+    streamText:'To renew your Albanian passport, you must apply at the General Directorate of Civil Status (DPGJC). You can visit any local police commissariat or DPGJC office near you...',
+    kbHint:'Enter to send · Shift+Enter for new line',
+    tryAgain:'Try again',
+    errorMsg:"I couldn't find an answer right now. Please try again.",
+    errorQ:'How do I get a building permit?',
+  },
+};
+
+/* ── Passport data ── */
+const PASSPORT = {
+  al: {
+    intro:'Për të rinovuar pasaportën tuaj, duhet të aplikoni pranë DPGJC ose Komisariatit të Policisë. Ja hapat e nevojshme:',
+    stepsLabel:'Hapat', progLabel:(n,t)=>`${n} / ${t} hapa të kryera`,
+    steps:['Paraqituni pranë sportelit DPGJC ose Komisariatit të Policisë','Plotësoni formularin e aplikimit (disponueshëm në e-albania.al)','Paguani tarifën e shërbimit prej 5,000 Lekësh pranë bankës ose postës','Dorëzoni formularin dhe dokumentet e nevojshme pranë sportelit','Prisni konfirmimin me SMS ose email (5–10 ditë pune)','Tërhiqni pasaportën tuaj të re pranë sportelit'],
+    docsLabel:'📋 Dokumentet e nevojshme', documents:['Kartë identiteti (ID)','2 foto pasaporti 35×45mm','Vërtetim pagese','Pasaporta e vjetër'],
+    note:'Pasaporta rinovohet çdo 10 vjet (të rriturit 18+), çdo 5 vjet (fëmijët).', noteLabel:'ℹ️', srcLabel:'Burim', source:'dpgjc.gov.al',
+  },
+  en: {
+    intro:'To renew your Albanian passport, apply at a DPGJC office or Police Commissariat. Here are the required steps:',
+    stepsLabel:'Steps', progLabel:(n,t)=>`${n} / ${t} steps completed`,
+    steps:['Visit your nearest DPGJC office or Police Commissariat','Fill out the passport renewal application (available on e-albania.al)','Pay the 5,000 ALL service fee at a bank or post office','Submit the completed form and documents at the counter','Wait for confirmation by SMS or email (5–10 working days)','Collect your new passport at the DPGJC office'],
+    docsLabel:'📋 Documents Required', documents:['National ID card','2 passport photos 35×45mm','Proof of payment','Old passport (if available)'],
+    note:'Passports are valid for 10 years (adults 18+) and 5 years (children under 18).', noteLabel:'ℹ️', srcLabel:'Source', source:'dpgjc.gov.al',
+  },
+};
+
+/* ── Conversation history data ── */
+const CONVS = {
+  al: {
+    label:'Bisedat', newConv:'Bisedë e re', whatToKnow:'Çfarë dëshironi të dini sot?',
+    today:'Sot', yesterday:'Dje', earlier:'Më parë',
+    items:[
+      {id:1,g:'today',   title:'Si të rinovoj pasaportën?'},
+      {id:2,g:'today',   title:'Si të hap një biznes shpk?'},
+      {id:3,g:'yesterday',title:'Si të aplikoj për patentë shoferi?'},
+      {id:4,g:'yesterday',title:'Si të regjistrojë automjetin tim?'},
+      {id:5,g:'earlier', title:'Dokumentet për leje qëndrimi'},
+      {id:6,g:'earlier', title:'Çfarë dokumentesh nevojiten për martesë?'},
+    ],
+  },
+  en: {
+    label:'Conversations', newConv:'New conversation', whatToKnow:'What would you like to know today?',
+    today:'Today', yesterday:'Yesterday', earlier:'Earlier',
+    items:[
+      {id:1,g:'today',   title:'How do I renew my passport?'},
+      {id:2,g:'today',   title:'How do I open a business?'},
+      {id:3,g:'yesterday',title:'How do I apply for a driver\'s license?'},
+      {id:4,g:'yesterday',title:'How do I register a vehicle?'},
+      {id:5,g:'earlier', title:'Documents for a residence permit'},
+      {id:6,g:'earlier', title:'What documents are needed for marriage?'},
+    ],
+  },
+};
+
+/* ── Section divider ── */
+function Divider({ label }) {
+  return (
+    <div style={{ background:PAGE, padding:'32px 48px 20px' }}>
+      <span style={{ fontSize:10.5, fontWeight:600, color:'#94928B', letterSpacing:'0.1em', textTransform:'uppercase' }}>── {label} ──</span>
+    </div>
+  );
+}
+
+/* ── Copy button ── */
+function CopyBtn() {
+  const [done, setDone] = useState(false);
+  const [hov, setHov] = useState(false);
+  return (
+    <button onClick={() => { setDone(true); setTimeout(() => setDone(false), 1500); }}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ width:24, height:24, borderRadius:'50%', background:hov?SOFT:'transparent', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'background 0.15s', flexShrink:0 }}>
+      {done
+        ? <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5L4 8.5L10 2" stroke={FG} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        : <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="4.5" y="1.5" width="6" height="7.5" rx="1.5" stroke={hov?FG:MUTED} strokeWidth="1.2"/><path d="M1.5 4.5v5.5a.5.5 0 0 0 .5.5H7" stroke={hov?FG:MUTED} strokeWidth="1.2" strokeLinecap="round"/></svg>
+      }
+    </button>
+  );
+}
+
+/* ── Language toggle ── */
+function LangToggle({ lang, setLang }) {
+  return (
+    <div style={{ display:'flex', alignItems:'center', gap:2 }}>
+      {['al','en'].map(l => { const a=lang===l; return (
+        <button key={l} onClick={() => setLang(l)} style={{ padding:a?'5px 12px':'5px 8px', fontSize:11, fontWeight:a?600:400, letterSpacing:'0.05em', color:a?BG:MUTED, background:a?FG:'transparent', border:'none', borderRadius:20, cursor:'pointer', transition:'all 0.18s ease' }}>
+          {l==='al'?'SQ':'EN'}
+        </button>
+      );})}
+    </div>
+  );
+}
+
+/* ── Sparkle icon ── */
+function Sparkle() {
+  return <svg width="10" height="10" viewBox="0 0 10 10" style={{ flexShrink:0 }}><path d="M5 0.5L5.9 4.1L9.5 5L5.9 5.9L5 9.5L4.1 5.9L0.5 5L4.1 4.1Z" fill="#B8B6AF"/></svg>;
+}
+
+/* ── Topbar ── */
+function TopBar({ lang, setLang, t, showNewChat, mobile, sidebarToggle, onSidebarToggle, showHistory }) {
+  const [hvr, setHvr] = useState(false);
+  const [shvr, setShvr] = useState(false);
+  const RefreshIcon = () => (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M12.5 7A5.5 5.5 0 1 1 7 1.5c1.8 0 3.4.86 4.43 2.2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+      <path d="M11 1v3.5H7.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+  return (
+    <header style={{ height:60, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:mobile?'0 16px':'0 28px', borderBottom:`1px solid ${BORDER}`, background:BG }}>
+      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+        {sidebarToggle && (
+          <button onMouseEnter={() => setShvr(true)} onMouseLeave={() => setShvr(false)} onClick={onSidebarToggle}
+            style={{ width:28, height:28, display:'flex', alignItems:'center', justifyContent:'center', background:'none', border:'none', cursor:'pointer', color:shvr?FG:MUTED, borderRadius:6, transition:'color 0.15s', marginRight:2 }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+          </button>
+        )}
+        <div style={{ width:7, height:7, borderRadius:'50%', background:ACCENT, flexShrink:0 }} />
+        <span style={{ fontSize:16, fontWeight:600, letterSpacing:'-0.025em', color:FG }}>Asistenti.al</span>
+      </div>
+      <div style={{ display:'flex', alignItems:'center', gap:18 }}>
+        {!mobile && (
+          <span style={{ fontSize:11.5, color:'#B8B6AF', display:'flex', alignItems:'center', gap:5 }}>
+            <Sparkle />{t.builtWith}&nbsp;<span style={{ color:GRAY, fontWeight:500 }}>{t.aiLabel}</span>
+          </span>
+        )}
+        {showHistory && mobile && (
+          <button onMouseEnter={() => setHvr(true)} onMouseLeave={() => setHvr(false)}
+            style={{ display:'flex', alignItems:'center', background:'none', border:'none', cursor:'pointer', color:hvr?FG:GRAY, transition:'color 0.15s', padding:'4px' }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4"/><path d="M8 5v3.5L10.5 11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+        )}
+        {showNewChat && (
+          <button onMouseEnter={() => setHvr(true)} onMouseLeave={() => setHvr(false)}
+            style={{ display:'flex', alignItems:'center', gap:5, background:'none', border:'none', cursor:'pointer', color:hvr?FG:GRAY, fontSize:13, transition:'color 0.15s', padding:'4px 0' }}>
+            <RefreshIcon />{!mobile && t.newChat}
+          </button>
+        )}
+        <LangToggle lang={lang} setLang={setLang} />
+      </div>
+    </header>
+  );
+}
+
+/* ── Input field ── */
+function InputField({ value, onChange, placeholder, disabled, size }) {
+  const [focused, setFocused] = useState(false);
+  const [bHov, setBHov] = useState(false);
+  const isLg = size!=='sm';
+  const hasText = !!(value&&value.trim());
+  const handleChange = e => {
+    if (disabled||!onChange) return;
+    onChange(e.target.value);
+    e.target.style.height='auto';
+    e.target.style.height=Math.min(e.target.scrollHeight,98)+'px';
+  };
+  return (
+    <div style={{ position:'relative', width:'100%', opacity:disabled?0.5:1, transition:'opacity 0.2s' }}>
+      <textarea value={value} onChange={handleChange} onKeyDown={e => { if(e.key==='Enter'&&!e.shiftKey) e.preventDefault(); }}
+        placeholder={placeholder} rows={1} disabled={disabled}
+        onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+        style={{ width:'100%', padding:isLg?'15px 56px 15px 22px':'12px 50px 12px 18px', fontSize:isLg?15:14, lineHeight:1.55, border:`1.5px solid ${focused?FG:BORDER}`, borderRadius:24, background:'#fff', color:FG, resize:'none', outline:'none', overflow:'hidden', transition:'border-color 0.15s', cursor:disabled?'not-allowed':'text' }}
+      />
+      <button disabled={disabled||!hasText} onMouseEnter={() => setBHov(true)} onMouseLeave={() => setBHov(false)}
+        style={{ position:'absolute', right:isLg?11:9, top:'50%', transform:`translateY(-50%) scale(${bHov&&hasText&&!disabled?1.05:1})`, width:isLg?34:30, height:isLg?34:30, borderRadius:'50%', background:hasText&&!disabled?FG:'#E0E0DC', border:'none', cursor:hasText&&!disabled?'pointer':'default', display:'flex', alignItems:'center', justifyContent:'center', transition:'background 0.15s, transform 0.1s', flexShrink:0 }}>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 10.5V1.5M1.5 6l4.5-4.5L10.5 6" stroke={hasText&&!disabled?'white':MUTED} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </button>
+    </div>
+  );
+}
+
+/* ── Pill ── */
+function Pill({ label, fullWidth }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ display:'block', width:fullWidth?'100%':'auto', textAlign:fullWidth?'center':'left', padding:'8px 16px', fontSize:13, color:hov?'#2A2A26':GRAY, background:hov?'#FFFFFF':'transparent', border:`1px solid ${hov?'#C4C3BC':BORDER}`, borderRadius:20, cursor:'pointer', transition:'all 0.13s', whiteSpace:fullWidth?'normal':'nowrap' }}>
+      {label}
+    </button>
+  );
+}
+
+/* ── Tiny shared atoms ── */
+function ALabel() {
+  return <div style={{ fontSize:11, fontWeight:500, color:MUTED, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:6 }}>Asistenti.al</div>;
+}
+function UserBubble({ content, mobile }) {
+  return (
+    <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8, animation:'fadeUp 0.2s ease' }}>
+      <div style={{ background:'#FFFFFF', border:`1px solid ${BORDER}`, borderRadius:'18px 18px 4px 18px', padding:'12px 16px', maxWidth:mobile?'85%':'75%', fontSize:15, lineHeight:1.6, color:FG }}>
+        {content}
+      </div>
+    </div>
+  );
+}
+function Dots() {
+  return (
+    <div style={{ animation:'fadeUp 0.2s ease' }}>
+      <ALabel />
+      <div style={{ display:'flex', gap:6, paddingTop:2, paddingBottom:4 }}>
+        {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:MUTED, animation:`dotPulse 1.3s ease-in-out ${i*.2}s infinite` }}/>)}
+      </div>
+    </div>
+  );
+}
+
+/* ── AssistantText (plain response with copy button on hover) ── */
+function AssistantText({ children }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ animation:'fadeUp 0.2s ease', position:'relative' }}>
+      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:8 }}>
+        <ALabel />
+        <div style={{ opacity:hov?1:0, transition:'opacity 0.15s', marginTop:-2 }}><CopyBtn /></div>
+      </div>
+      <p style={{ fontSize:15, color:FG, lineHeight:1.7, maxWidth:'90%' }}>{children}</p>
+    </div>
+  );
+}
+
+/* ── StepCard ── */
+function StepCard({ lang, mobile }) {
+  const [chk, setChk] = useState({});
+  const [hov, setHov] = useState(false);
+  const d = PASSPORT[lang];
+  const toggle = i => setChk(p => ({ ...p, [i]:!p[i] }));
+  const done = Object.values(chk).filter(Boolean).length;
+  const total = d.steps.length;
+  const pct = total > 0 ? done/total : 0;
+
+  return (
+    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ animation:'fadeUp 0.2s ease', position:'relative' }}>
+      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:8 }}>
+        <ALabel />
+        <div style={{ opacity:hov?1:0, transition:'opacity 0.15s', marginTop:-2 }}><CopyBtn /></div>
+      </div>
+      <div style={{ background:'#FFFFFF', border:`1px solid ${BORDER}`, borderRadius:16, padding:mobile?16:24 }}>
+        <p style={{ fontSize:14, color:FG, lineHeight:1.7, marginBottom:16 }}>{d.intro}</p>
+        {/* Progress */}
+        <div style={{ marginBottom:14 }}>
+          <div style={{ fontSize:11, color:MUTED, marginBottom:6 }}>{d.progLabel(done, total)}</div>
+          <div style={{ height:3, background:SOFT, borderRadius:2, overflow:'hidden' }}>
+            <div style={{ height:'100%', width:`${pct*100}%`, background:FG, borderRadius:2, transition:'width 0.25s ease' }} />
+          </div>
+        </div>
+        <div style={{ fontSize:11, fontWeight:500, color:MUTED, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:12 }}>{d.stepsLabel}</div>
+        {d.steps.map((step, i) => (
+          <div key={i} onClick={() => toggle(i)} style={{ display:'flex', alignItems:'flex-start', gap:12, padding:'10px 0', borderBottom:i<d.steps.length-1?`1px solid ${SOFT}`:'none', cursor:'pointer', userSelect:'none' }}>
+            <div style={{ width:20, height:20, borderRadius:'50%', border:chk[i]?'none':'1.5px solid #D0D0CA', background:chk[i]?FG:'transparent', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:2, transition:'all 0.1s ease' }}>
+              {chk[i] && <svg width="10" height="10" viewBox="0 0 10 10" style={{ animation:'checkPop 0.22s cubic-bezier(0.175,0.885,0.32,1.3)' }}><path d="M1.5 5L3.5 7.5L8.5 2.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>}
+            </div>
+            <div style={{ flex:1, display:'flex', gap:10 }}>
+              <span style={{ fontSize:13, color:MUTED, flexShrink:0, minWidth:18, paddingTop:1 }}>{i+1}.</span>
+              <span style={{ fontSize:14, lineHeight:1.6, color:chk[i]?MUTED:FG, textDecoration:chk[i]?'line-through':'none', textDecorationColor:MUTED, transition:'color 0.15s' }}>{step}</span>
+            </div>
+          </div>
+        ))}
+        <div style={{ borderTop:`1px solid ${SOFT}`, margin:'20px 0 14px' }} />
+        <div style={{ fontSize:13, fontWeight:600, color:FG, marginBottom:10 }}>{d.docsLabel}</div>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+          {d.documents.map((doc, i) => <span key={i} style={{ fontSize:mobile?12:13, color:FG, background:SOFT, borderRadius:6, padding:'4px 10px' }}>{doc}</span>)}
+        </div>
+        <div style={{ marginTop:16, background:'#FDFBF0', border:'1px solid #EDE8A0', borderRadius:8, padding:'10px 14px', fontSize:13, color:GRAY, lineHeight:1.5 }}>
+          {d.noteLabel}&nbsp;{d.note}
+        </div>
+        <div style={{ marginTop:14, display:'flex', alignItems:'center', gap:5 }}>
+          <span style={{ fontSize:11, color:MUTED }}>{d.srcLabel}: {d.source}</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ opacity:.38 }}><path d="M4 2H2.5A1.5 1.5 0 0 0 1 3.5v4A1.5 1.5 0 0 0 2.5 9h4A1.5 1.5 0 0 0 8 7.5V6M6 1h3v3M5.5 4.5L9 1" stroke={MUTED} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── ChatArea (shared scroll container + sticky input) ── */
+function ChatArea({ children, lang, mobile, showHint }) {
+  const t = T[lang];
+  const [val, setVal] = useState('');
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', position:'relative' }}>
+      {/* Top fade */}
+      <div style={{ position:'absolute', top:0, left:0, right:0, height:32, zIndex:2, background:`linear-gradient(to bottom, ${BG}, transparent)`, pointerEvents:'none' }} />
+      <div style={{ flex:1, overflowY:'auto', padding:mobile?'24px 16px':'32px 24px' }}>
+        <div style={{ maxWidth:680, margin:'0 auto', display:'flex', flexDirection:'column', gap:24 }}>
+          {children}
+        </div>
+      </div>
+      <div style={{ borderTop:`1px solid ${BORDER}`, background:BG, padding:mobile?'12px 16px':'14px 24px', flexShrink:0 }}>
+        <div style={{ maxWidth:680, margin:'0 auto' }}>
+          <InputField value={val} onChange={setVal} placeholder={t.placeholder} size="sm" />
+          {showHint && !mobile && <div style={{ textAlign:'center', fontSize:11, color:MUTED, marginTop:7 }}>{t.kbHint}</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Conversation sidebar ── */
+function ConvSidebar({ lang }) {
+  const c = CONVS[lang];
+  const [activeId, setActiveId] = useState(1);
+  const [hovId, setHovId] = useState(null);
+  const [hovNew, setHovNew] = useState(false);
+  return (
+    <div style={{ width:260, background:'#EFEDE8', flexShrink:0, display:'flex', flexDirection:'column', borderRight:`1px solid ${BORDER}` }}>
+      <div style={{ padding:'20px 16px 12px', borderBottom:`1px solid ${BORDER}` }}>
+        <div style={{ fontSize:11, fontWeight:500, color:MUTED, letterSpacing:'0.08em', textTransform:'uppercase' }}>{c.label}</div>
+      </div>
+      <div style={{ flex:1, overflowY:'auto' }}>
+        {['today','yesterday','earlier'].map(g => (
+          <div key={g}>
+            <div style={{ fontSize:10, fontWeight:600, color:MUTED, letterSpacing:'0.08em', textTransform:'uppercase', padding:'14px 14px 6px' }}>{c[g]}</div>
+            {c.items.filter(x => x.g===g).map(item => (
+              <div key={item.id} onClick={() => setActiveId(item.id)}
+                onMouseEnter={() => setHovId(item.id)} onMouseLeave={() => setHovId(null)}
+                style={{ padding:'10px 12px 10px 12px', margin:'0 6px 2px', borderRadius:8, cursor:'pointer', background:activeId===item.id?'#E4E2DC':hovId===item.id?'#E8E6E0':'transparent', borderLeft:`2px solid ${activeId===item.id?ACCENT:'transparent'}`, transition:'all 0.1s' }}>
+                <div style={{ fontSize:13, color:FG, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{item.title}</div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div style={{ borderTop:`1px solid ${BORDER}`, flexShrink:0 }}>
+        <button onMouseEnter={() => setHovNew(true)} onMouseLeave={() => setHovNew(false)}
+          style={{ width:'100%', padding:'14px 16px', display:'flex', alignItems:'center', gap:7, background:hovNew?'#E4E2DC':'transparent', border:'none', cursor:'pointer', fontSize:13, color:FG, fontFamily:'Inter, system-ui, sans-serif', transition:'background 0.13s', textAlign:'left' }}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12.5 7A5.5 5.5 0 1 1 7 1.5c1.8 0 3.4.86 4.43 2.2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><path d="M11 1v3.5H7.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          {c.newConv}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ════ STATE 1 — HERO ════ */
+function HeroState({ lang, setLang, mobile, showExtra }) {
+  const t = T[lang];
+  const [val, setVal] = useState('');
+  const visible = useMemo(() => [...t.suggestions.slice(0,3), ...t.suggestions.slice(3).filter((_,i) => showExtra[i])], [lang, showExtra]);
+  return (
+    <div style={{ background:BG }}>
+      <TopBar lang={lang} setLang={setLang} t={t} mobile={mobile} />
+      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:mobile?'64px 16px 80px':'80px 32px 100px', minHeight:mobile?'auto':520 }}>
+        <h1 style={{ fontSize:mobile?36:56, fontWeight:700, letterSpacing:'-0.032em', lineHeight:1.08, textAlign:'center', color:FG, marginBottom:16, maxWidth:680, textWrap:'pretty' }}>
+          {t.headline.split('\n').map((ln,i,a) => <span key={i}>{ln}{i<a.length-1&&<br/>}</span>)}
+        </h1>
+        <p style={{ fontSize:mobile?15:17, fontWeight:400, color:GRAY, textAlign:'center', marginBottom:44, lineHeight:1.6, maxWidth:480 }}>{t.subtext}</p>
+        <div style={{ width:'100%', maxWidth:mobile?'100%':600, marginBottom:18 }}>
+          <InputField value={val} onChange={setVal} placeholder={t.placeholder} size="lg" />
+        </div>
+        <div style={{ display:'flex', flexDirection:mobile?'column':'row', flexWrap:mobile?'nowrap':'wrap', gap:8, justifyContent:'center', width:mobile?'100%':'auto', maxWidth:580 }}>
+          {visible.map((s,i) => <Pill key={i} label={s} fullWidth={mobile} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════ STATE 2 — CHAT VIEW ════ */
+function ChatState({ lang, setLang, mobile }) {
+  const t = T[lang];
+  return (
+    <div style={{ background:BG, display:'flex', flexDirection:'column', height:mobile?680:660 }}>
+      <TopBar lang={lang} setLang={setLang} t={t} showNewChat mobile={mobile} />
+      <ChatArea lang={lang} mobile={mobile} showHint>
+        <div>
+          <UserBubble content={t.passportQ} mobile={mobile} />
+          <StepCard lang={lang} mobile={mobile} />
+        </div>
+        <div>
+          <UserBubble content={lang==='al'?'A mund ta bëj online?':'Can I do this online?'} mobile={mobile} />
+          <AssistantText>
+            {lang==='al'
+              ? 'Po, aplikimi paraprak mund të bëhet nëpërmjet portalit e-Albania (e-albania.al). Megjithatë, paraqitja fizike pranë sportelit mbetet e detyrueshme për dorëzimin e dokumenteve dhe marrjen e pasaportës.'
+              : 'Yes, you can initiate the application online through the e-Albania portal (e-albania.al). However, a physical visit to the DPGJC office is still required to submit documents and collect your passport.'}
+          </AssistantText>
+        </div>
+      </ChatArea>
+    </div>
+  );
+}
+
+/* ════ STATE 3 — STREAMING ════ */
+function StreamingState({ lang, setLang }) {
+  const t = T[lang];
+  const words = t.streamText.split(' ');
+  const [wc, setWc] = useState(0);
+  const [phase, setPhase] = useState('waiting');
+  useEffect(() => { setWc(0); setPhase('waiting'); }, [lang]);
+  useEffect(() => {
+    if (phase==='waiting') { const id=setTimeout(() => setPhase('streaming'),1600); return () => clearTimeout(id); }
+    if (phase==='streaming') {
+      if (wc<words.length) { const id=setTimeout(() => setWc(w=>w+1),70); return () => clearTimeout(id); }
+      else { const id=setTimeout(() => { setPhase('waiting'); setWc(0); },2800); return () => clearTimeout(id); }
+    }
+  }, [phase, wc, words.length]);
+  const Sub = ({c}) => <div style={{ fontSize:10, fontWeight:600, color:'#A8A6A0', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:16 }}>{c}</div>;
+  const panel = { flex:1, background:BG, border:`1px solid ${BORDER}`, borderRadius:12, padding:24, overflow:'hidden' };
+  return (
+    <div style={{ background:PAGE, paddingBottom:40 }}>
+      <div style={{ background:BG, borderTop:`1px solid ${BORDER}` }}><TopBar lang={lang} setLang={setLang} t={t} showNewChat /></div>
+      <div style={{ display:'flex', gap:16, padding:'32px 32px 0', maxWidth:1200, margin:'0 auto' }}>
+        <div style={panel}>
+          <Sub c="1 — Waiting" />
+          <UserBubble content={t.passportQ} />
+          <Dots />
+          <div style={{ marginTop:20, opacity:0.5, pointerEvents:'none' }}><InputField value="" placeholder={t.placeholder} size="sm" disabled /></div>
+        </div>
+        <div style={panel}>
+          <Sub c="2 — Streaming" />
+          <UserBubble content={t.passportQ} />
+          <div style={{ animation:'fadeUp 0.2s ease' }}>
+            <ALabel />
+            <p style={{ fontSize:15, color:FG, lineHeight:1.7 }}>
+              {words.slice(0,wc).join(' ')}
+              <span style={{ display:'inline-block', width:2, height:'1em', background:FG, marginLeft:2, verticalAlign:'text-bottom', animation:'blink 0.5s step-end infinite' }}/>
+            </p>
+          </div>
+          <div style={{ marginTop:20, opacity:0.5, pointerEvents:'none' }}><InputField value="" placeholder={t.placeholder} size="sm" disabled /></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════ MOBILE FRAME ════ */
+function MobileFrame({ children }) {
+  return (
+    <div style={{ background:PAGE, padding:'40px 0 48px', display:'flex', justifyContent:'center' }}>
+      <div style={{ width:375, background:BG, boxShadow:'0 8px 48px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.08)', overflow:'hidden' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ════ STATE 6 — SIDEBAR LAYOUT ════ */
+function State6({ lang, setLang }) {
+  const t = T[lang];
+  const [open, setOpen] = useState(true);
+  return (
+    <div style={{ background:BG, display:'flex', flexDirection:'column', height:700 }}>
+      <TopBar lang={lang} setLang={setLang} t={t} sidebarToggle onSidebarToggle={() => setOpen(o=>!o)} />
+      <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
+        {open && <ConvSidebar lang={lang} />}
+        <ChatArea lang={lang} showHint>
+          <div>
+            <UserBubble content={t.passportQ} />
+            <StepCard lang={lang} />
+          </div>
+        </ChatArea>
+      </div>
+    </div>
+  );
+}
+
+/* ════ STATE 6 MOBILE — HISTORY DRAWER ════ */
+function State6Mobile({ lang, setLang }) {
+  const t = T[lang];
+  const c = CONVS[lang];
+  const [activeId, setActiveId] = useState(1);
+  return (
+    <div style={{ background:BG, height:700, position:'relative', display:'flex', flexDirection:'column', overflow:'hidden' }}>
+      <TopBar lang={lang} setLang={setLang} t={t} mobile showHistory />
+      {/* Dimmed chat behind drawer */}
+      <div style={{ flex:1, overflowY:'auto', padding:'24px 16px', opacity:0.35, pointerEvents:'none' }}>
+        <UserBubble content={t.passportQ} mobile />
+        <div style={{ background:'#fff', border:`1px solid ${BORDER}`, borderRadius:16, padding:16, height:100, marginTop:8 }} />
+      </div>
+      {/* Overlay */}
+      <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.3)', zIndex:10 }} />
+      {/* Bottom sheet */}
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, zIndex:20, background:'#fff', height:'65%', borderRadius:'16px 16px 0 0', boxShadow:'0 -4px 32px rgba(0,0,0,0.12)', display:'flex', flexDirection:'column', overflow:'hidden', animation:'slideUp 0.3s ease' }}>
+        <div style={{ display:'flex', justifyContent:'center', padding:'12px 0 6px' }}>
+          <div style={{ width:40, height:4, borderRadius:2, background:'#D0D0CA' }} />
+        </div>
+        <div style={{ padding:'10px 16px 12px', borderBottom:`1px solid ${BORDER}` }}>
+          <span style={{ fontSize:14, fontWeight:600, color:FG }}>{c.label}</span>
+        </div>
+        <div style={{ flex:1, overflowY:'auto', paddingBottom:8 }}>
+          {['today','yesterday','earlier'].map(g => (
+            <div key={g}>
+              <div style={{ fontSize:10, fontWeight:600, color:MUTED, letterSpacing:'0.08em', textTransform:'uppercase', padding:'12px 14px 5px' }}>{c[g]}</div>
+              {c.items.filter(x => x.g===g).map(item => (
+                <div key={item.id} onClick={() => setActiveId(item.id)}
+                  style={{ padding:'11px 16px', margin:'0 8px 2px', borderRadius:8, cursor:'pointer', background:activeId===item.id?'#F2F1EC':'transparent', borderLeft:`2px solid ${activeId===item.id?ACCENT:'transparent'}`, transition:'all 0.1s' }}>
+                  <div style={{ fontSize:14, color:FG, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{item.title}</div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════ STATE 7 — NEW CONVERSATION (empty) ════ */
+function State7({ lang, setLang }) {
+  const t = T[lang];
+  const c = CONVS[lang];
+  return (
+    <div style={{ background:BG, display:'flex', flexDirection:'column', height:700 }}>
+      <TopBar lang={lang} setLang={setLang} t={t} sidebarToggle />
+      <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
+        <ConvSidebar lang={lang} />
+        <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+          <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'0 32px' }}>
+            <div style={{ width:6, height:6, borderRadius:'50%', background:ACCENT, marginBottom:12 }} />
+            <div style={{ fontSize:15, fontWeight:600, color:FG, marginBottom:8, textAlign:'center' }}>Asistenti.al</div>
+            <div style={{ fontSize:13, color:MUTED, marginBottom:28, textAlign:'center' }}>{c.whatToKnow}</div>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:8, justifyContent:'center', maxWidth:460 }}>
+              {t.suggestions.slice(0,3).map((s,i) => <Pill key={i} label={s} />)}
+            </div>
+          </div>
+          <div style={{ borderTop:`1px solid ${BORDER}`, background:BG, padding:'14px 24px', flexShrink:0 }}>
+            <div style={{ maxWidth:680, margin:'0 auto' }}>
+              <InputField value="" placeholder={t.placeholder} size="sm" />
+              <div style={{ textAlign:'center', fontSize:11, color:MUTED, marginTop:7 }}>{t.kbHint}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════ STATE 8 — ERROR STATE ════ */
+function State8({ lang, setLang }) {
+  const t = T[lang];
+  const [hov, setHov] = useState(false);
+  const [val, setVal] = useState('');
+  return (
+    <div style={{ background:BG, display:'flex', flexDirection:'column', height:440 }}>
+      <TopBar lang={lang} setLang={setLang} t={t} showNewChat />
+      <div style={{ flex:1, overflowY:'auto', padding:'32px 24px' }}>
+        <div style={{ maxWidth:680, margin:'0 auto', display:'flex', flexDirection:'column', gap:24 }}>
+          <div>
+            <UserBubble content={t.errorQ} />
+            <div style={{ animation:'fadeUp 0.2s ease' }}>
+              <ALabel />
+              <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:12, padding:'14px 16px', maxWidth:'80%' }}>
+                <p style={{ fontSize:13, color:'#7F1D1D', lineHeight:1.6, marginBottom:10 }}>⚠️&nbsp;{t.errorMsg}</p>
+                <button onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+                  style={{ fontSize:12, color:ACCENT, background:'none', border:'none', cursor:'pointer', textDecoration:hov?'underline':'none', padding:0, fontFamily:'Inter, system-ui, sans-serif' }}>
+                  {t.tryAgain}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style={{ borderTop:`1px solid ${BORDER}`, background:BG, padding:'14px 24px', flexShrink:0 }}>
+        <div style={{ maxWidth:680, margin:'0 auto' }}>
+          <InputField value={val} onChange={setVal} placeholder={t.placeholder} size="sm" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════ TWEAKS ════ */
+function TweaksPanel({ tweaks, setTweaks, onClose }) {
+  const update = (k,v) => { const n={...tweaks,[k]:v}; setTweaks(n); window.parent.postMessage({type:'__edit_mode_set_keys',edits:n},'*'); };
+  return (
+    <div style={{ position:'fixed', bottom:20, right:20, width:220, background:'#fff', border:`1px solid ${BORDER}`, borderRadius:14, boxShadow:'0 8px 32px rgba(0,0,0,0.12)', zIndex:1000, overflow:'hidden' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', borderBottom:`1px solid ${BORDER}` }}>
+        <span style={{ fontSize:13, fontWeight:600, color:FG }}>Tweaks</span>
+        <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:MUTED, fontSize:20, lineHeight:1, padding:'0 2px' }}>×</button>
+      </div>
+      <div style={{ padding:'14px 16px' }}>
+        <div style={{ fontSize:10.5, fontWeight:600, color:MUTED, textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:10 }}>Accent color</div>
+        <div style={{ display:'flex', gap:9 }}>
+          {ACCENT_OPTS.map(o => <button key={o.hex} onClick={() => update('accent',o.hex)} title={o.label} style={{ width:28, height:28, borderRadius:'50%', background:o.hex, border:'none', cursor:'pointer', boxShadow:tweaks.accent===o.hex?`0 0 0 2px #fff, 0 0 0 4px ${o.hex}`:'0 1px 3px rgba(0,0,0,0.15)', transition:'box-shadow 0.15s' }}/>)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════ APP ════ */
+function App() {
+  const [lang, setLang] = useState('al');
+  const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+  const [showTweaks, setShowTweaks] = useState(false);
+  const showExtra = useMemo(() => [Math.random()>.45, Math.random()>.55], []);
+
+  useEffect(() => {
+    const h = e => {
+      if (e.data?.type==='__activate_edit_mode')   setShowTweaks(true);
+      if (e.data?.type==='__deactivate_edit_mode') setShowTweaks(false);
+    };
+    window.addEventListener('message', h);
+    window.parent.postMessage({type:'__edit_mode_available'},'*');
+    return () => window.removeEventListener('message', h);
+  }, []);
+
+  return (
+    <div>
+      <HeroState lang={lang} setLang={setLang} showExtra={showExtra} />
+
+      <Divider label="State 2 — Chat View" />
+      <ChatState lang={lang} setLang={setLang} />
+
+      <Divider label="State 3 — Streaming / Loading" />
+      <StreamingState lang={lang} setLang={setLang} />
+
+      <Divider label="State 4 — Mobile Hero (375px)" />
+      <MobileFrame><HeroState lang={lang} setLang={setLang} mobile showExtra={showExtra} /></MobileFrame>
+
+      <Divider label="State 5 — Mobile Chat (375px)" />
+      <MobileFrame><ChatState lang={lang} setLang={setLang} mobile /></MobileFrame>
+
+      <Divider label="State 6 — Chat History Sidebar" />
+      <State6 lang={lang} setLang={setLang} />
+
+      <Divider label="State 6b — Mobile History Drawer (375px)" />
+      <MobileFrame><State6Mobile lang={lang} setLang={setLang} /></MobileFrame>
+
+      <Divider label="State 7 — New Conversation (empty)" />
+      <State7 lang={lang} setLang={setLang} />
+
+      <Divider label="State 8 — Error State" />
+      <State8 lang={lang} setLang={setLang} />
+
+      <div style={{ height:60, background:PAGE }} />
+
+      {showTweaks && <TweaksPanel tweaks={tweaks} setTweaks={setTweaks} onClose={() => { setShowTweaks(false); window.parent.postMessage({type:'__edit_mode_dismissed'},'*'); }}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
