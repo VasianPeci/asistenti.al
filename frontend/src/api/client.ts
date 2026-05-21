@@ -6,7 +6,7 @@ import type {
   SseEventType,
 } from "./types";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "/api";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export interface ChatRequestBody {
   message: string;
@@ -50,7 +50,7 @@ function toChunk(event: SseEvent): StreamChunk | null {
 
 export async function* streamChat(
   body: ChatRequestBody,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk, void, void> {
   let res: Response;
   try {
@@ -75,7 +75,10 @@ export async function* streamChat(
   if (!res.ok || !res.body) {
     yield {
       type: "error",
-      data: { code: "network_error", message: `Request failed (${res.status})` },
+      data: {
+        code: "network_error",
+        message: `Request failed (${res.status})`,
+      },
     };
     return;
   }
@@ -83,6 +86,7 @@ export async function* streamChat(
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let doneReceived = false;
 
   try {
     while (true) {
@@ -97,7 +101,11 @@ export async function* streamChat(
         const event = parseFrame(raw);
         if (event) {
           const chunk = toChunk(event);
-          if (chunk) yield chunk;
+          if (chunk) {
+            if (chunk.type === "done") doneReceived = true;
+            yield chunk;
+            if (chunk.type === "error") return;
+          }
         }
         boundary = buffer.indexOf("\n\n");
       }
@@ -106,8 +114,21 @@ export async function* streamChat(
       const event = parseFrame(buffer);
       if (event) {
         const chunk = toChunk(event);
-        if (chunk) yield chunk;
+        if (chunk) {
+          if (chunk.type === "done") doneReceived = true;
+          yield chunk;
+          if (chunk.type === "error") return;
+        }
       }
+    }
+    if (!doneReceived) {
+      yield {
+        type: "error",
+        data: {
+          code: "stream_truncated",
+          message: "The response stream closed before completion.",
+        },
+      };
     }
   } catch (err) {
     if ((err as Error).name === "AbortError") return;
@@ -139,7 +160,7 @@ export interface RestoreMessage {
 export async function restoreSession(
   sessionId: string,
   messages: Message[],
-  limit = 6
+  limit = 6,
 ): Promise<void> {
   const trimmed: RestoreMessage[] = messages
     .slice(-limit)

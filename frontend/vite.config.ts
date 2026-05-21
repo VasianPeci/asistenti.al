@@ -11,6 +11,14 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
+      "/chat": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/session": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      }
     },
   },
 });

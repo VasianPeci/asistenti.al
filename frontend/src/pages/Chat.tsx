@@ -157,6 +157,8 @@ export default function Chat(): JSX.Element {
           code: "client_error",
           message: err instanceof Error ? err.message : "Unknown error",
         });
+      } finally {
+        if (abortRef.current === controller) abortRef.current = null;
       }
     },
     [

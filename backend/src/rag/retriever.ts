@@ -12,17 +12,18 @@ export interface RetrievedChunk {
 
 export interface RetrieveOptions {
   topK?: number;
-  minSimilarity?: number;
   corpusName?: string;
 }
 
 const DEFAULT_TOP_K = 5;
-const DEFAULT_MIN_SIMILARITY = 0.6;
 const RETRIEVE_TIMEOUT_MS = 8000;
 
 function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    const timer = setTimeout(
+      () => reject(new Error(`${label} timed out after ${ms}ms`)),
+      ms,
+    );
     p.then(
       (v) => {
         clearTimeout(timer);
@@ -31,26 +32,31 @@ function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
       (e) => {
         clearTimeout(timer);
         reject(e);
-      }
+      },
     );
   });
 }
 
 export async function retrieve(
   query: string,
-  options: RetrieveOptions = {}
+  options: RetrieveOptions = {},
 ): Promise<RetrievedChunk[]> {
   const normalized = normalizeAlbanian(query);
   if (!normalized) return [];
 
   const topK = options.topK ?? DEFAULT_TOP_K;
-  const minSimilarity = options.minSimilarity ?? DEFAULT_MIN_SIMILARITY;
 
   try {
     const corpusName =
       options.corpusName ??
       env.VERTEX_RAG_CORPUS ??
-      (await withTimeout(getOrCreateCorpus(), RETRIEVE_TIMEOUT_MS, "getOrCreateCorpus")).name;
+      (
+        await withTimeout(
+          getOrCreateCorpus(),
+          RETRIEVE_TIMEOUT_MS,
+          "getOrCreateCorpus",
+        )
+      ).name;
 
     const client = getRagServiceClient();
     const [response] = await withTimeout(
@@ -65,26 +71,30 @@ export async function retrieve(
         },
       }),
       RETRIEVE_TIMEOUT_MS,
-      "retrieveContexts"
+      "retrieveContexts",
     );
 
     const contexts = response.contexts?.contexts ?? [];
-    const chunks: RetrievedChunk[] = contexts
-      .map((ctx) => {
-        const similarity =
-          typeof ctx.score === "number"
-            ? ctx.score
-            : typeof ctx.distance === "number"
-              ? 1 - ctx.distance
-              : 0;
-        return {
-          text: ctx.text ?? "",
-          source: ctx.sourceDisplayName ?? ctx.sourceUri ?? "unknown",
-          similarity,
-        };
-      })
-      .filter((c) => c.text.length > 0 && c.similarity >= minSimilarity);
 
+    const chunks: RetrievedChunk[] = contexts
+      .map((ctx) => ({
+        text: ctx.text ?? "",
+        source: ctx.sourceDisplayName ?? ctx.sourceUri ?? "unknown",
+        similarity: typeof ctx.score === "number" ? ctx.score : 0,
+      }))
+      .filter((c) => c.text.length > 0);
+
+    logger.info("rag.retrieve.result", {
+      query: normalized.slice(0, 60),
+      rawContexts: contexts.length,
+      usableChunks: chunks.length,
+      scores: chunks.map((c) => c.similarity),
+    });
+
+    // Vertex's retrieveContexts already returns the server-ranked top-K.
+    // We do NOT threshold on `score` here: for the default RagManagedDb
+    // `score` is a distance (lower = better), so a `>=` cutoff would drop
+    // the best matches. topK is the only limit we need.
     return chunks;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

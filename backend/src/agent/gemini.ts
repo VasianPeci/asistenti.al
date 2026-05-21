@@ -61,22 +61,40 @@ export async function* streamChat(
   const { message, history = [], contextChunks = [] } = options;
 
   const systemInstruction = buildSystemPrompt(formatContext(contextChunks));
+  logger.info("gemini.prompt.built", {
+    contextChunks: contextChunks.length,
+    historyMessages: history.length,
+    promptChars: systemInstruction.length,
+  });
   const model = getModel(systemInstruction);
 
   const chat = model.startChat({ history: buildHistory(history) });
 
   try {
+    logger.info("gemini.generation.started", {
+      model: env.VERTEX_MODEL,
+      messageChars: message.length,
+    });
     const result = await chat.sendMessageStream(message);
+    logger.info("gemini.stream.opened");
+    let sawFirstChunk = false;
     for await (const item of result.stream) {
       const candidates = item.candidates ?? [];
       for (const candidate of candidates) {
         const parts = candidate.content?.parts ?? [];
         for (const part of parts) {
           const text = (part as { text?: string }).text;
-          if (typeof text === "string" && text.length > 0) yield text;
+          if (typeof text === "string" && text.length > 0) {
+            if (!sawFirstChunk) {
+              sawFirstChunk = true;
+              logger.info("gemini.first_chunk.received", { chars: text.length });
+            }
+            yield text;
+          }
         }
       }
     }
+    logger.info("gemini.stream.finished", { receivedChunks: sawFirstChunk });
   } catch (err) {
     const messageText = err instanceof Error ? err.message : String(err);
     logger.error("gemini.stream.failed", { error: messageText });

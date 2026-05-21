@@ -18,6 +18,15 @@ const ChatRequestSchema = z.object({
 
 type SseEventType = "token" | "done" | "error";
 
+const AI_STREAM_TIMEOUT_MS = 45_000;
+
+class AiGenerationTimeoutError extends Error {
+  constructor() {
+    super(`AI generation timed out after ${AI_STREAM_TIMEOUT_MS}ms`);
+    this.name = "AiGenerationTimeoutError";
+  }
+}
+
 function isAlbanian(text: string): boolean {
   if (/[ëçËÇ]/.test(text)) return true;
   // Note: dropped "me" and "do" from the spec's keyword list — both are
@@ -52,6 +61,21 @@ function writeEvent(res: Response, type: SseEventType, data: unknown): void {
   res.write(`data: ${JSON.stringify({ type, data })}\n\n`);
 }
 
+async function nextWithTimeout<T>(
+  next: Promise<IteratorResult<T>>,
+  remainingMs: number
+): Promise<IteratorResult<T>> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new AiGenerationTimeoutError()), remainingMs);
+  });
+  try {
+    return await Promise.race([next, timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 function openSse(res: Response): void {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache, no-transform");
@@ -61,8 +85,12 @@ function openSse(res: Response): void {
 }
 
 chatRouter.post("/chat", async (req, res) => {
+  logger.info("chat.request.received", {
+    hasBody: typeof req.body === "object" && req.body !== null,
+  });
   const parsed = ChatRequestSchema.safeParse(req.body);
   if (!parsed.success) {
+    logger.warn("chat.request.invalid", { issues: parsed.error.issues });
     const body: ApiErrorBody = {
       error: {
         code: "invalid_request",
@@ -75,25 +103,34 @@ chatRouter.post("/chat", async (req, res) => {
   }
 
   const { message, sessionId } = parsed.data;
+  logger.info("chat.request.valid", { sessionId, messageChars: message.length });
 
   openSse(res);
 
   let clientClosed = false;
-  req.on("close", () => {
-    clientClosed = true;
+  res.on("close", () => {
+    if (!res.writableEnded) {
+      clientClosed = true;
+      logger.info("chat.client.closed", { sessionId });
+    }
   });
 
   const safeFail = (logMessage: string, err: unknown): void => {
+    const timedOut = err instanceof AiGenerationTimeoutError;
     logger.error(logMessage, {
       sessionId,
       error: err instanceof Error ? err.message : String(err),
     });
     if (!res.writableEnded) {
       writeEvent(res, "error", {
-        code: "chat_failed",
-        message: "Something went wrong. Please try again.",
+        code: timedOut ? "ai_timeout" : "chat_failed",
+        message: timedOut
+          ? "The AI response timed out. Please try again."
+          : "Something went wrong. Please try again.",
       });
+      logger.info("chat.response.error_sent", { sessionId });
       res.end();
+      logger.info("chat.response.ended", { sessionId });
     }
   };
 
@@ -102,39 +139,74 @@ chatRouter.post("/chat", async (req, res) => {
 
     let chunks: RetrievedChunk[] = [];
     try {
+      logger.info("chat.rag.retrieve.started", { sessionId, topK: 4 });
       chunks = await retrieve(message, { topK: 4 });
+      logger.info("chat.rag.retrieve.finished", { sessionId, chunks: chunks.length });
     } catch (err) {
       logger.warn("chat.retrieve.failed", {
         sessionId,
         error: err instanceof Error ? err.message : String(err),
       });
       chunks = [];
+      logger.info("chat.rag.retrieve.finished", { sessionId, chunks: 0, failed: true });
     }
 
     if (chunks.length === 0) {
       const fallback = noInfoResponse(message);
       writeEvent(res, "token", fallback.answer);
       writeEvent(res, "done", fallback);
+      logger.info("chat.response.done_sent", { sessionId, fallback: true });
       appendMessages(sessionId, [
         { role: "user", content: message },
         { role: "assistant", content: fallback.answer },
       ]);
       res.end();
+      logger.info("chat.response.ended", { sessionId });
       return;
     }
 
     let accumulated = "";
+    logger.info("chat.ai.stream.started", {
+      sessionId,
+      timeoutMs: AI_STREAM_TIMEOUT_MS,
+    });
+    const stream = streamChat({
+      message,
+      history,
+      contextChunks: chunks,
+    });
+    const iterator = stream[Symbol.asyncIterator]();
+    const deadline = Date.now() + AI_STREAM_TIMEOUT_MS;
+    let sawFirstToken = false;
     try {
-      for await (const token of streamChat({
-        message,
-        history,
-        contextChunks: chunks,
-      })) {
-        if (clientClosed) return;
+      while (true) {
+        if (clientClosed) {
+          await iterator.return?.();
+          return;
+        }
+        const remainingMs = deadline - Date.now();
+        if (remainingMs <= 0) throw new AiGenerationTimeoutError();
+        const next = await nextWithTimeout(iterator.next(), remainingMs);
+        if (next.done) break;
+        const token = next.value;
+        if (!sawFirstToken) {
+          sawFirstToken = true;
+          logger.info("chat.ai.first_token.received", { sessionId, chars: token.length });
+        }
         accumulated += token;
         writeEvent(res, "token", token);
       }
+      logger.info("chat.ai.stream.finished", {
+        sessionId,
+        responseChars: accumulated.length,
+      });
     } catch (err) {
+      await iterator.return?.().catch((returnErr: unknown) => {
+        logger.warn("chat.ai.stream.return_failed", {
+          sessionId,
+          error: returnErr instanceof Error ? returnErr.message : String(returnErr),
+        });
+      });
       safeFail("chat.stream.failed", err);
       return;
     }
@@ -153,6 +225,7 @@ chatRouter.post("/chat", async (req, res) => {
     finalResponse.source = friendlySource(finalResponse.source);
 
     writeEvent(res, "done", finalResponse);
+    logger.info("chat.response.done_sent", { sessionId, fallback: false });
 
     appendMessages(sessionId, [
       { role: "user", content: message },
@@ -160,6 +233,7 @@ chatRouter.post("/chat", async (req, res) => {
     ]);
 
     res.end();
+    logger.info("chat.response.ended", { sessionId });
   } catch (err) {
     safeFail("chat.unexpected", err);
   }

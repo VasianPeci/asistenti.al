@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { existsSync } from "node:fs";
 import { z } from "zod";
 
 const EnvSchema = z.object({
@@ -22,6 +23,20 @@ function loadEnv(): Env {
       .join("\n");
     console.error(`[env] Invalid environment configuration:\n${issues}`);
     process.exit(1);
+  }
+  if (
+    parsed.data.GOOGLE_APPLICATION_CREDENTIALS &&
+    !existsSync(parsed.data.GOOGLE_APPLICATION_CREDENTIALS)
+  ) {
+    console.error(
+      `[env] GOOGLE_APPLICATION_CREDENTIALS points to a file that does not exist: ${parsed.data.GOOGLE_APPLICATION_CREDENTIALS}`
+    );
+    process.exit(1);
+  }
+  if (!parsed.data.GOOGLE_APPLICATION_CREDENTIALS) {
+    console.warn(
+      "[env] GOOGLE_APPLICATION_CREDENTIALS is not set; Vertex AI will rely on Application Default Credentials."
+    );
   }
   return parsed.data;
 }
