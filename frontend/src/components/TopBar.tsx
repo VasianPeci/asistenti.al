@@ -48,8 +48,7 @@ export default function TopBar({
   const { t } = useTranslation();
   return (
     <header className="sticky top-0 z-30 h-[60px] shrink-0 flex items-center justify-between px-4 md:px-7 border-b border-border bg-bg">
-      <div className="flex items-center gap-2">
-        <span className="w-[7px] h-[7px] rounded-full bg-accent shrink-0" aria-hidden="true" />
+      <div className="flex items-center">
         <span className="text-base font-semibold tracking-tight text-fg">
           {t("app.title")}
         </span>
