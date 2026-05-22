@@ -289,9 +289,6 @@ export default function Chat(): JSX.Element {
                   disabled={isStreaming}
                   size="sm"
                 />
-                <p className="hidden md:block text-center text-[11px] text-gray-muted mt-2">
-                  {t("input.kbHint")}
-                </p>
               </div>
             </div>
           </>
@@ -337,6 +334,7 @@ function HeroEmptyState({ onSelect, onSubmit }: HeroProps): JSX.Element {
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="min-h-full flex flex-col items-center justify-center px-4 md:px-8 py-12 md:py-20">
+        <AssistantMascot />
         <h1 className="text-[36px] md:text-[56px] font-bold tracking-[-0.032em] leading-[1.08] text-center text-fg mb-4 max-w-[680px]">
           {t("app.tagline")}
         </h1>
@@ -347,6 +345,26 @@ function HeroEmptyState({ onSelect, onSubmit }: HeroProps): JSX.Element {
           <ChatInput onSubmit={onSubmit} size="lg" autoFocus />
         </div>
         <SuggestedQuestions onSelect={onSelect} />
+      </div>
+    </div>
+  );
+}
+
+function AssistantMascot(): JSX.Element {
+  return (
+    <div className="assistant-mascot mb-7" aria-hidden="true">
+      <div className="assistant-mascot__antenna" />
+      <div className="assistant-mascot__head">
+        <div className="assistant-mascot__visor">
+          <span />
+          <span />
+        </div>
+        <div className="assistant-mascot__mouth" />
+      </div>
+      <div className="assistant-mascot__base">
+        <div className="assistant-mascot__badge" />
+        <div className="assistant-mascot__arm assistant-mascot__arm--left" />
+        <div className="assistant-mascot__arm assistant-mascot__arm--right" />
       </div>
     </div>
   );

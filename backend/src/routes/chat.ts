@@ -6,7 +6,14 @@ import { retrieve, type RetrievedChunk } from "../rag/retriever";
 import { mergeRetrievedChunks, retrievePinnedServiceChunks } from "../rag/localGrounding";
 import { friendlySource } from "../rag/sourceMap";
 import { streamChat } from "../agent/gemini";
-import { parseAgentResponse, type AgentResponse, type SuggestedService } from "../agent/parser";
+import {
+  parseAgentResponse,
+  type AgentResponse,
+  type StepChannel,
+  type StepDetail,
+  type StepDifficulty,
+  type SuggestedService,
+} from "../agent/parser";
 import { appendMessages, clearSession, getHistory, setHistory } from "../agent/memory";
 
 export const chatRouter: Router = Router();
@@ -42,7 +49,7 @@ function normalizeMessageText(text: string): string {
 function detectResponseLanguage(text: string): "sq" | "en" {
   const normalized = normalizeMessageText(text);
   if (
-    /\b(si|cfare|cafe|ku|kur|sa|dua|duhet|mund|aplikoj|rinovoj|marr|kerkoj|dokument\w*|nevojiten|certifikat\w*|lindj\w*|vdekj\w*|vdekje|deshmi|penalitet|pasaport\w*|martes\w*|qendrim\w*|automjet\w*|pershendetj\w*|tung|ckemi|miredita|miremengjes|mirembrema)\b/u.test(
+    /\b(si|cfare|cafe|ku|kur|sa|dua|duhet|mund|aplikoj|rinovoj|marr|kerkoj|dokument\w*|nevojiten|certifikat\w*|lindj\w*|vdekj\w*|vdekje|deshmi|penalitet|pasaport\w*|martes\w*|qendrim\w*|automjet\w*|pershendetj\w*|hej+|tung|ckemi|miredita|miremengjes|mirembrema)\b/u.test(
       normalized
     )
   ) {
@@ -65,12 +72,13 @@ function isGreeting(text: string): boolean {
   const normalized = normalizeMessageText(text);
 
   if (!normalized) return false;
-  if (/^(hello+|hey+|hi+|pershendetje+|tung+|ckemi+)$/.test(normalized)) return true;
+  if (/^(hello+|hey+|hi+|hej+|pershendetje+|tung+|ckemi+)$/.test(normalized)) return true;
 
   const greetings = new Set([
     "hi",
     "hello",
     "hey",
+    "hej",
     "good morning",
     "good afternoon",
     "good evening",
@@ -87,9 +95,10 @@ function isGreeting(text: string): boolean {
 
 function isAlbanianGreeting(text: string): boolean {
   const normalized = normalizeMessageText(text);
-  if (/^(pershendetje+|tung+|ckemi+)$/.test(normalized)) return true;
+  if (/^(hej+|pershendetje+|tung+|ckemi+)$/.test(normalized)) return true;
 
   return new Set([
+    "hej",
     "pershendetje",
     "tung",
     "ckemi",
@@ -156,6 +165,90 @@ function hasServiceIntent(text: string): boolean {
   ];
 
   return serviceKeywords.some((keyword) => normalized.includes(keyword));
+}
+
+function buildRetrievalQuery(message: string, history: ReturnType<typeof getHistory>): string {
+  const recent = history
+    .slice(-4)
+    .map((entry) => entry.content)
+    .join(" ");
+  return `${recent} ${message}`.trim();
+}
+
+function asksOnlyForDocuments(text: string): boolean {
+  const normalized = normalizeMessageText(text);
+  return (
+    /\b(documents?|documentacion|dokument\w*)\b/u.test(normalized) &&
+    !/\b(how|steps?|apply|complete|process|si|hapat|aplikoj|kryej)\b/u.test(normalized)
+  );
+}
+
+function asksForSingleDetail(text: string): boolean {
+  const normalized = normalizeMessageText(text);
+  return /\b(format|size|photo|foto|fotografi|cm|jpg|jpeg|png|tarif|fee|cost|kosto|pages|time|kohe|processing)\b/u.test(
+    normalized
+  );
+}
+
+function keepOnlyRequestedScope(response: AgentResponse, message: string): AgentResponse {
+  if (asksOnlyForDocuments(message) || asksForSingleDetail(message)) {
+    response.steps = [];
+    response.stepDetails = [];
+  }
+  if (asksForSingleDetail(message) && !asksOnlyForDocuments(message)) {
+    response.documents = [];
+  }
+  return response;
+}
+
+function inferStepChannel(step: string): StepChannel {
+  const normalized = normalizeMessageText(step);
+  const digitalWords = /\b(online|portal|e-albania|aplikim elektronik|elektronik|login|account|llogari|upload|ngarko|submit|dergo|form|formular)\b/u;
+  const manualWords = /\b(office|zyre|paraqit|fizik|personalisht|sportel|appointment|takim|coupon|kupon|print|scan|signed|nenshkruar)\b/u;
+  const digital = digitalWords.test(normalized);
+  const manual = manualWords.test(normalized);
+  if (digital && manual) return "hybrid";
+  if (manual) return "manual";
+  return "digital";
+}
+
+function inferStepDifficulty(step: string, channel: StepChannel): StepDifficulty {
+  const normalized = normalizeMessageText(step);
+  if (
+    /\b(court|gjykat|prokur|noter|power of attorney|prokure|authorization|autorizim|multiple|disa|appeal|ankim|verification|verifikim)\b/u.test(
+      normalized
+    )
+  ) {
+    return "hard";
+  }
+  if (
+    channel === "manual" ||
+    /\b(payment|pagese|fee|tarif|appointment|takim|wait|prit|working days|dite pune|documents?|dokument|upload|ngarko)\b/u.test(
+      normalized
+    )
+  ) {
+    return "medium";
+  }
+  return "easy";
+}
+
+function ensureStepDetails(response: AgentResponse): AgentResponse {
+  if (response.steps.length === 0) {
+    response.stepDetails = [];
+    return response;
+  }
+
+  if (response.stepDetails?.length === response.steps.length) return response;
+
+  response.stepDetails = response.steps.map((step): StepDetail => {
+    const channel = inferStepChannel(step);
+    return {
+      channel,
+      difficulty: inferStepDifficulty(step, channel),
+      note: null,
+    };
+  });
+  return response;
 }
 
 function serviceMenuResponse(message: string, reason: "greeting" | "unknown"): AgentResponse {
@@ -256,11 +349,13 @@ function isNoInfoAnswer(response: AgentResponse): boolean {
 function cleanFinalResponse(response: AgentResponse): AgentResponse {
   if (response.parseFailed) {
     response.documents = [];
+    response.stepDetails = [];
     response.source = null;
     return response;
   }
   if (isNoInfoAnswer(response)) {
     response.documents = [];
+    response.stepDetails = [];
     response.source = null;
     return response;
   }
@@ -425,7 +520,8 @@ chatRouter.post("/chat", async (req, res) => {
       return;
     }
 
-    if (!hasServiceIntent(message)) {
+    const retrievalQuery = buildRetrievalQuery(message, history);
+    if (!hasServiceIntent(retrievalQuery)) {
       logger.info("chat.service_intent.not_identified", { sessionId });
       const response = serviceMenuResponse(message, "unknown");
       writeEvent(res, "token", response.answer);
@@ -444,11 +540,11 @@ chatRouter.post("/chat", async (req, res) => {
       return;
     }
 
-    const pinnedChunks = retrievePinnedServiceChunks(message);
+    const pinnedChunks = retrievePinnedServiceChunks(retrievalQuery);
     let chunks: RetrievedChunk[] = pinnedChunks;
     try {
       logger.info("chat.rag.retrieve.started", { sessionId, topK: 4 });
-      const ragChunks = await retrieve(message, { topK: 4 });
+      const ragChunks = await retrieve(retrievalQuery, { topK: 4 });
       chunks = mergeRetrievedChunks(pinnedChunks, ragChunks);
       logger.info("chat.rag.retrieve.finished", { sessionId, chunks: chunks.length });
     } catch (err) {
@@ -521,7 +617,9 @@ chatRouter.post("/chat", async (req, res) => {
       }
     }
     finalResponse.language = responseLanguage;
+    keepOnlyRequestedScope(finalResponse, message);
     cleanFinalResponse(finalResponse);
+    ensureStepDetails(finalResponse);
 
     if (!finalResponse.source && !isNoInfoAnswer(finalResponse)) {
       const firstSource = chunks[0]?.source ?? null;

@@ -30,11 +30,30 @@
     "retry": "Try again",
     "copy": "Copy",
     "copied": "Copied",
+    "exportPdf": "Download PDF",
+    "exportTitle": "Service guidance",
+    "note": "Note",
     "services": "Services",
     "steps": "Steps",
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "channel": {
+      "digital": "Digital",
+      "manual": "In person",
+      "hybrid": "Online + in person"
+    },
     "completed": "Nice work, all steps are complete.",
     "progress": "{{done}} / {{total}} steps completed",
     "assistantLabel": "Asistenti.al"
+  },
+  "fontZoom": {
+    "label": "Text size",
+    "decrease": "Decrease text size",
+    "increase": "Increase text size",
+    "reset": "Reset text size"
   },
   "history": {
     "title": "Conversations",

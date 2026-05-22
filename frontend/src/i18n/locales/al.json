@@ -30,11 +30,30 @@
     "retry": "Provoni përsëri",
     "copy": "Kopjo",
     "copied": "U kopjua",
+    "exportPdf": "Shkarko PDF",
+    "exportTitle": "Udhëzim për shërbimin",
+    "note": "Shënim",
     "services": "Shërbimet",
     "steps": "Hapat",
+    "difficulty": {
+      "easy": "E lehtë",
+      "medium": "Mesatare",
+      "hard": "E vështirë"
+    },
+    "channel": {
+      "digital": "Digjitale",
+      "manual": "Në zyrë",
+      "hybrid": "Online + në zyrë"
+    },
     "completed": "Shumë mirë, të gjithë hapat u përfunduan.",
     "progress": "{{done}} / {{total}} hapa të kryera",
     "assistantLabel": "Asistenti.al"
+  },
+  "fontZoom": {
+    "label": "Madhësia e tekstit",
+    "decrease": "Zvogëlo tekstin",
+    "increase": "Zmadho tekstin",
+    "reset": "Rivendos tekstin"
   },
   "history": {
     "title": "Bisedat",

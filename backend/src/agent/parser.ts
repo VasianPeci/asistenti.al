@@ -5,6 +5,7 @@ export interface AgentResponse {
   source: string | null;
   note?: string | null;
   services?: SuggestedService[];
+  stepDetails?: StepDetail[];
   language?: "sq" | "en";
   parseFailed?: boolean;
 }
@@ -12,6 +13,15 @@ export interface AgentResponse {
 export interface SuggestedService {
   label: string;
   query: string;
+}
+
+export type StepDifficulty = "easy" | "medium" | "hard";
+export type StepChannel = "digital" | "manual" | "hybrid";
+
+export interface StepDetail {
+  difficulty: StepDifficulty;
+  channel: StepChannel;
+  note?: string | null;
 }
 
 function stripCodeFences(text: string): string {
@@ -54,6 +64,30 @@ function coerceStringArray(value: unknown): string[] {
   return value.filter((v): v is string => typeof v === "string");
 }
 
+function isStepDifficulty(value: unknown): value is StepDifficulty {
+  return value === "easy" || value === "medium" || value === "hard";
+}
+
+function isStepChannel(value: unknown): value is StepChannel {
+  return value === "digital" || value === "manual" || value === "hybrid";
+}
+
+function coerceStepDetails(value: unknown): StepDetail[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item): StepDetail | null => {
+      if (!item || typeof item !== "object") return null;
+      const obj = item as Record<string, unknown>;
+      if (!isStepDifficulty(obj.difficulty) || !isStepChannel(obj.channel)) return null;
+      return {
+        difficulty: obj.difficulty,
+        channel: obj.channel,
+        note: coerceOptionalString(obj.note),
+      };
+    })
+    .filter((item): item is StepDetail => item !== null);
+}
+
 function coerceOptionalString(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const cleaned = cleanLooseString(value);
@@ -64,7 +98,7 @@ function cleanLooseString(value: string): string {
   return value
     .split(/\r?\n/)[0]!
     .replace(/\bCohere\b/gi, "")
-    .replace(/,\s*"?(answer|steps|documents|source|note|services|language|parseFailed)"?\s*:.*$/i, "")
+    .replace(/,\s*"?(answer|steps|documents|source|note|services|stepDetails|language|parseFailed)"?\s*:.*$/i, "")
     .replace(/["\]}{,[\s]+$/g, "")
     .trim();
 }
@@ -126,6 +160,7 @@ function parseLooseAgentResponse(rawText: string, responseLanguage: "sq" | "en")
     source,
     note: coerceOptionalString(note),
     services: [],
+    stepDetails: [],
     language: responseLanguage,
     parseFailed: false,
   };
@@ -153,6 +188,7 @@ export function parseAgentResponse(rawText: string, responseLanguage: "sq" | "en
           source: typeof obj.source === "string" ? obj.source : null,
           note: coerceOptionalString(obj.note),
           services: [],
+          stepDetails: coerceStepDetails(obj.stepDetails),
           language: responseLanguage,
           parseFailed: false,
         };
@@ -176,6 +212,7 @@ export function parseAgentResponse(rawText: string, responseLanguage: "sq" | "en
     source: null,
     note: null,
     services: [],
+    stepDetails: [],
     language: responseLanguage,
     parseFailed: true,
   };

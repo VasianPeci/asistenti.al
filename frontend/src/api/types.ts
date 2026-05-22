@@ -17,8 +17,18 @@ export interface AgentResponse {
   source: string | null;
   note?: string | null;
   services?: SuggestedService[];
+  stepDetails?: StepDetail[];
   language?: "sq" | "en";
   parseFailed?: boolean;
+}
+
+export type StepDifficulty = "easy" | "medium" | "hard";
+export type StepChannel = "digital" | "manual" | "hybrid";
+
+export interface StepDetail {
+  difficulty: StepDifficulty;
+  channel: StepChannel;
+  note?: string | null;
 }
 
 export interface SuggestedService {
