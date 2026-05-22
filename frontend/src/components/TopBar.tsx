@@ -42,6 +42,38 @@ function RefreshIcon(): JSX.Element {
   );
 }
 
+function TopBarLogo(): JSX.Element {
+  return (
+    <div className="topbar-logo" aria-hidden="true">
+      <span className="topbar-logo__spark topbar-logo__spark--left" />
+      <span className="topbar-logo__spark topbar-logo__spark--right" />
+      <div className="topbar-logo__bot">
+        <span className="topbar-logo__antenna" />
+        <span className="topbar-logo__head">
+          <span className="topbar-logo__visor">
+            <span />
+            <span />
+          </span>
+          <span className="topbar-logo__mouth" />
+        </span>
+        <span className="topbar-logo__body">
+          <span className="topbar-logo__eagle">
+            <svg viewBox="0 0 32 32" aria-hidden="true">
+              <path
+                d="M16 5.6c-1.4 2-3 3.1-5.2 3.4 1.3.7 2.5 1.3 3.2 2.2-2.5-.9-5.6-1.1-8.6-.1 2.2 1.1 4.1 2.2 5.1 3.7-2.5-.4-4.6.1-6.5 1.7 2.3.1 4.3.7 5.5 1.9-1.4.2-2.5.8-3.3 1.8 2.5-.2 4.6.5 6.1 2.1-.4 1.1-.9 2.1-1.6 3.2 1.8-.4 3.3-1.2 4.4-2.5.3 1.2.6 2.3.9 3.4.3-1.1.6-2.2.9-3.4 1.1 1.3 2.6 2.1 4.4 2.5-.7-1.1-1.2-2.1-1.6-3.2 1.5-1.6 3.6-2.3 6.1-2.1-.8-1-1.9-1.6-3.3-1.8 1.2-1.2 3.2-1.8 5.5-1.9-1.9-1.6-4-2.1-6.5-1.7 1-1.5 2.9-2.6 5.1-3.7-3-1-6.1-.8-8.6.1.7-.9 1.9-1.5 3.2-2.2-2.2-.3-3.8-1.4-5.2-3.4Z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
+        </span>
+        <span className="topbar-logo__arm topbar-logo__arm--left" />
+        <span className="topbar-logo__arm topbar-logo__arm--right" />
+        <span className="topbar-logo__shadow" />
+      </div>
+    </div>
+  );
+}
+
 const FONT_SCALE_KEY = "asistenti.fontScale";
 const FONT_SCALES = [0.94, 1, 1.08, 1.16] as const;
 
@@ -120,7 +152,8 @@ export default function TopBar({
   const { t } = useTranslation();
   return (
     <header className="sticky top-0 z-30 h-[60px] shrink-0 flex items-center justify-between px-4 md:px-7 border-b border-border bg-bg">
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        <TopBarLogo />
         <span className="text-base font-semibold tracking-tight text-fg">
           {t("app.title")}
         </span>

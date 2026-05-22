@@ -48,7 +48,7 @@ export default function Chat(): JSX.Element {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [lastUserMessage, setLastUserMessage] = useState<string>("");
   const displayStreamingText = useMemo(
-    () => extractStreamingAnswer(streamingText),
+    () => extractStreamingAnswer(streamingText) || streamingText,
     [streamingText]
   );
   const initialized = useRef(false);
@@ -362,7 +362,14 @@ function AssistantMascot(): JSX.Element {
         <div className="assistant-mascot__mouth" />
       </div>
       <div className="assistant-mascot__base">
-        <div className="assistant-mascot__badge" />
+        <div className="assistant-mascot__badge">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path
+              d="M16 5.6c-1.4 2-3 3.1-5.2 3.4 1.3.7 2.5 1.3 3.2 2.2-2.5-.9-5.6-1.1-8.6-.1 2.2 1.1 4.1 2.2 5.1 3.7-2.5-.4-4.6.1-6.5 1.7 2.3.1 4.3.7 5.5 1.9-1.4.2-2.5.8-3.3 1.8 2.5-.2 4.6.5 6.1 2.1-.4 1.1-.9 2.1-1.6 3.2 1.8-.4 3.3-1.2 4.4-2.5.3 1.2.6 2.3.9 3.4.3-1.1.6-2.2.9-3.4 1.1 1.3 2.6 2.1 4.4 2.5-.7-1.1-1.2-2.1-1.6-3.2 1.5-1.6 3.6-2.3 6.1-2.1-.8-1-1.9-1.6-3.3-1.8 1.2-1.2 3.2-1.8 5.5-1.9-1.9-1.6-4-2.1-6.5-1.7 1-1.5 2.9-2.6 5.1-3.7-3-1-6.1-.8-8.6.1.7-.9 1.9-1.5 3.2-2.2-2.2-.3-3.8-1.4-5.2-3.4Z"
+              fill="currentColor"
+            />
+          </svg>
+        </div>
         <div className="assistant-mascot__arm assistant-mascot__arm--left" />
         <div className="assistant-mascot__arm assistant-mascot__arm--right" />
       </div>

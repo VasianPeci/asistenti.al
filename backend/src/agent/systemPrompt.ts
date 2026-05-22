@@ -24,20 +24,10 @@ RULES:
    {
      "answer": "1-2 sentence intro",
      "steps": ["step 1", "step 2", ...],
-     "stepDetails": [
-       { "difficulty": "easy|medium|hard", "channel": "digital|manual|hybrid", "note": "short reason or null" }
-     ],
      "documents": ["doc 1", "doc 2", ...],
      "source": "filename.txt",
      "note": "optional caveat or null"
    }
-   "stepDetails" must have exactly one item per step when steps are present.
-   Use channel "digital" for online portal actions, "manual" for in-person
-   office/physical actions, and "hybrid" when a step combines both.
-   Use difficulty "easy" for simple account/form/upload actions, "medium" for
-   steps needing preparation, payment, appointment, or waiting, and "hard" for
-   steps involving multiple institutions, legal authorization, or complex review.
-   Leave "stepDetails" as [] when "steps" is [].
 7. Return ONLY the JSON object. No markdown fences. No prose outside JSON.
    Escape all quotes inside JSON strings.
 8. Tone: warm, clear, never bureaucratic. Like a knowledgeable friend.

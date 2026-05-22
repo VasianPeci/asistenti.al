@@ -27,6 +27,17 @@ const ChatRequestSchema = z.object({
 type SseEventType = "token" | "done" | "error";
 
 const AI_STREAM_TIMEOUT_MS = 45_000;
+const STREAMING_ANSWER_PATTERN = /"answer"\s*:\s*"((?:[^"\\]|\\.)*)/;
+const JSON_ESCAPE_MAP: Record<string, string> = {
+  '"': '"',
+  "\\": "\\",
+  "/": "/",
+  n: "\n",
+  t: "\t",
+  r: "\r",
+  b: "\b",
+  f: "\f",
+};
 
 class AiGenerationTimeoutError extends Error {
   constructor() {
@@ -44,6 +55,38 @@ function normalizeMessageText(text: string): string {
     .replace(/(.)\1{2,}/g, "$1$1")
     .replace(/[!?.,"'()[\]{}:;]+/g, "")
     .replace(/\s+/g, " ");
+}
+
+function unescapeJsonString(raw: string): string {
+  let out = "";
+  for (let i = 0; i < raw.length; i += 1) {
+    const ch = raw[i];
+    if (ch === "\\" && i + 1 < raw.length) {
+      const next = raw[i + 1]!;
+      const mapped = JSON_ESCAPE_MAP[next];
+      if (mapped !== undefined) {
+        out += mapped;
+        i += 1;
+        continue;
+      }
+      if (next === "u" && i + 5 < raw.length) {
+        const hex = raw.slice(i + 2, i + 6);
+        if (/^[0-9a-fA-F]{4}$/.test(hex)) {
+          out += String.fromCharCode(parseInt(hex, 16));
+          i += 5;
+          continue;
+        }
+      }
+    }
+    out += ch;
+  }
+  return out;
+}
+
+function extractStreamingAnswer(buffer: string): string {
+  const match = STREAMING_ANSWER_PATTERN.exec(buffer);
+  if (!match || match[1] === undefined) return "";
+  return unescapeJsonString(match[1]);
 }
 
 function detectResponseLanguage(text: string): "sq" | "en" {
@@ -346,6 +389,10 @@ function isNoInfoAnswer(response: AgentResponse): boolean {
   );
 }
 
+function looksLikeJsonFragment(value: string): boolean {
+  return /^"?(channel|difficulty|note|stepDetails)"?\s*:/i.test(value.trim());
+}
+
 function cleanFinalResponse(response: AgentResponse): AgentResponse {
   if (response.parseFailed) {
     response.documents = [];
@@ -360,6 +407,10 @@ function cleanFinalResponse(response: AgentResponse): AgentResponse {
     return response;
   }
 
+  response.steps = response.steps.filter((step) => !looksLikeJsonFragment(step));
+  if (response.stepDetails?.length !== response.steps.length) {
+    response.stepDetails = [];
+  }
   response.documents = response.documents.filter((document) => !/\.txt$/i.test(document.trim()));
   if (response.source?.trim().toLowerCase() === "no info") response.source = null;
   return response;
@@ -384,6 +435,29 @@ async function nextWithTimeout<T>(
   }
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function chunkAnswerDelta(delta: string): string[] {
+  const parts = delta.match(/\S+\s*/g);
+  if (!parts) return delta ? [delta] : [];
+  const chunks: string[] = [];
+  let current = "";
+
+  for (const part of parts) {
+    if ((current + part).length > 28 && current) {
+      chunks.push(current);
+      current = part;
+    } else {
+      current += part;
+    }
+  }
+
+  if (current) chunks.push(current);
+  return chunks;
+}
+
 async function collectAiResponseWithTimeout(options: {
   message: string;
   history: ReturnType<typeof getHistory>;
@@ -391,8 +465,10 @@ async function collectAiResponseWithTimeout(options: {
   responseLanguage: "sq" | "en";
   sessionId: string;
   clientClosed: () => boolean;
+  onAnswerToken?: (token: string) => void | Promise<void>;
 }): Promise<string | null> {
   let accumulated = "";
+  let streamedAnswerChars = 0;
   logger.info("chat.ai.stream.started", {
     sessionId: options.sessionId,
     timeoutMs: AI_STREAM_TIMEOUT_MS,
@@ -426,6 +502,14 @@ async function collectAiResponseWithTimeout(options: {
         });
       }
       accumulated += token;
+      if (options.onAnswerToken) {
+        const answer = extractStreamingAnswer(accumulated);
+        if (answer.length > streamedAnswerChars) {
+          const delta = answer.slice(streamedAnswerChars);
+          streamedAnswerChars = answer.length;
+          await options.onAnswerToken(delta);
+        }
+      }
     }
     logger.info("chat.ai.stream.finished", {
       sessionId: options.sessionId,
@@ -579,6 +663,13 @@ chatRouter.post("/chat", async (req, res) => {
         responseLanguage,
         sessionId,
         clientClosed: () => clientClosed,
+        onAnswerToken: async (token) => {
+          for (const chunk of chunkAnswerDelta(token)) {
+            if (clientClosed || res.writableEnded) return;
+            writeEvent(res, "token", chunk);
+            await sleep(18);
+          }
+        },
       });
     } catch (err) {
       safeFail("chat.stream.failed", err);
